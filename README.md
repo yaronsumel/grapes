@@ -1,16 +1,16 @@
-# grape
-grape is lightweight tool designed to distribute commands over ssh with ease.
+# grapes
+grapes is lightweight tool designed to distribute commands over ssh with ease.
 
  Installation and usage
  ----------------------
 
  To install it, run:
 
-     go get -u github.com/yaronsumel/grape
+     go get -u github.com/yaronsumel/grapes
 
  Usage Example :
 
-     grape -c config.yml -i ~/.ssh/id_rsa -s prod -command whats_up
+     grapes -c config.yml -i ~/.ssh/id_rsa -s prod -command whats_up
 
 config structure:
 
