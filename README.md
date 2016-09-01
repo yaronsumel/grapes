@@ -1,14 +1,5 @@
 # grape
-
- Introduction
- ------------
-
-TBD
-
- Compatibility
- -------------
-
-TBD
+grape is lightweight tool designed to distribute commands over ssh with ease.
 
  Installation and usage
  ----------------------
