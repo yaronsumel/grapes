@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	auth struct {
+	grapeSsh struct {
 		keySigner ssh.Signer
 	}
 	grapeSshClient struct {
@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func (this *auth)setKey(keyPath keyPath) {
+func (this *grapeSsh)setKey(keyPath keyPath) {
 	privateBytes, err := ioutil.ReadFile(string(*keyPath))
 	if err != nil {
 		log.Fatal("setKey", err)
@@ -39,7 +39,7 @@ func (this *auth)setKey(keyPath keyPath) {
 	this.keySigner = privateKey
 }
 
-func (this *auth)newClient(server server) grapeSshClient {
+func (this *grapeSsh)newClient(server server) grapeSshClient {
 	client, err := ssh.Dial("tcp", server.Host, &ssh.ClientConfig{
 		User: server.User,
 		Auth: []ssh.AuthMethod{

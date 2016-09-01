@@ -1,13 +1,5 @@
 package main
 
-//      ____ __________ _____  ___  _____
-//     / __  / ___/ __  / __ \/ _ \/ ___/
-//    / /_/ / /  / /_/ / /_/ /  __(__  )
-//    \__, /_/   \__,_/ .___/\___/____/
-//   /____/          /_/
-//
-// Version 0.1 -- Yaron Sumel [yaronsu@gmail.com]
-
 import (
 	"sync"
 	"fmt"
@@ -17,7 +9,7 @@ import (
 type (
 	grape struct {
 		input  input
-		auth   auth
+		ssh    grapeSsh
 		config config
 	}
 	serverOutput struct {
@@ -36,8 +28,8 @@ const (
 //    \__, /_/   \__,_/ .___/\___/____/
 //   /____/          /_/
 //
-// Version 0.1 -- Yaron Sumel [yaronsu@gmail.com]
-//`
+// Version 0.1.1 -- Yaron Sumel [yaronsu@gmail.com]
+`
 )
 
 var wg sync.WaitGroup
@@ -54,7 +46,7 @@ func newGrape() *grape {
 	grape.input.parse()
 	//grape.input.validate()
 
-	grape.auth.setKey(grape.input.keyPath)
+	grape.ssh.setKey(grape.input.keyPath)
 	grape.config.set(grape.input.configPath)
 
 	return &grape
@@ -82,7 +74,7 @@ func (app *grape)asyncRunCommand(server server, wg *sync.WaitGroup) {
 }
 
 func (app *grape)runCommandsOnServer(server server) {
-	client := app.auth.newClient(server)
+	client := app.ssh.newClient(server)
 	o := serverOutput{
 		Server:server,
 	}
