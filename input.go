@@ -20,51 +20,29 @@ type input struct {
 	commandName commandName
 }
 
-const (
-	FLAG_ASYNC_KEY  = "async"
-	FLAG_ASYNC_DESC = "async - when true, parallel executing over servers"
-	FLAG_ASYNC_DEF  = false
+func (input *input) parse() {
 
-	FLAG_CONFIG_PATH_KEY  = "c"
-	FLAG_CONFIG_PATH_DESC = "config file - yaml config file"
-	FLAG_CONFIG_PATH_DEF  = ""
-
-	FLAG_KEY_PATH_KEY  = "i"
-	FLAG_KEY_PATH_DESC = "identity file - path to private key"
-	FLAG_KEY_PATH_DEF  = ""
-
-	FLAG_GROUP_KEY  = "s"
-	FLAG_GROUP_DESC = "server group - name of the server group"
-	FLAG_GROUP_DEF  = ""
-
-	FLAG_COMMAND_KEY  = "cmd"
-	FLAG_COMMAND_DESC = "command name - name of the command to run"
-	FLAG_COMMAND_DEF  = ""
-)
-
-func (this *input) parse() {
-
-	asyncFlagPtr := flag.Bool(FLAG_ASYNC_KEY, FLAG_ASYNC_DEF, FLAG_ASYNC_DESC)
-	configPathPtr := flag.String(FLAG_CONFIG_PATH_KEY, FLAG_CONFIG_PATH_DEF, FLAG_CONFIG_PATH_DESC)
-	keyPathPtr := flag.String(FLAG_KEY_PATH_KEY, FLAG_KEY_PATH_DEF, FLAG_KEY_PATH_DESC)
-	serverGroupPtr := flag.String(FLAG_GROUP_KEY, FLAG_GROUP_DEF, FLAG_GROUP_DESC)
-	commandPtr := flag.String(FLAG_COMMAND_KEY, FLAG_COMMAND_DEF, FLAG_COMMAND_DESC)
+	asyncFlagPtr := flag.Bool("async", false,"async - when true, parallel executing over servers")
+	configPathPtr := flag.String("c", "", "config file - yaml config file")
+	keyPathPtr := flag.String("i", "", "identity file - path to private key")
+	serverGroupPtr := flag.String("s", "", "server group - name of the server group")
+	commandPtr := flag.String("cmd", "", "command name - name of the command to run")
 
 	flag.Parse()
 
-	this.asyncFlag = asyncFlag(*asyncFlagPtr)
-	this.commandName = commandName(*commandPtr)
-	this.serverGroup = serverGroup(*serverGroupPtr)
-	this.keyPath = keyPath(*keyPathPtr)
-	this.configPath = configPath(*configPathPtr)
+	input.asyncFlag = asyncFlag(*asyncFlagPtr)
+	input.commandName = commandName(*commandPtr)
+	input.serverGroup = serverGroup(*serverGroupPtr)
+	input.keyPath = keyPath(*keyPathPtr)
+	input.configPath = configPath(*configPathPtr)
 
 }
 
-func (this *input) validate() {
-	this.configPath.validate()
-	this.keyPath.validate()
-	this.serverGroup.validate()
-	this.commandName.validate()
+func (input *input) validate() {
+	input.configPath.validate()
+	input.keyPath.validate()
+	input.serverGroup.validate()
+	input.commandName.validate()
 }
 
 func (val *configPath) validate() {
@@ -87,6 +65,6 @@ func (val *serverGroup) validate() {
 
 func (val *commandName) validate() {
 	if *val == "" {
-		fatal("command name is empty please set grapes -command whats_up")
+		fatal("command name is empty please set grapes -cmd whats_up")
 	}
 }

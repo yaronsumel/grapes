@@ -8,26 +8,26 @@ import (
 )
 
 type (
-	grapeSsh struct {
+	grapeSSH struct {
 		keySigner ssh.Signer
 	}
-	grapeSshClient struct {
+	grapeSSHClient struct {
 		*ssh.Client
 	}
-	grapeSshSession struct {
+	grapeSSHSession struct {
 		*ssh.Session
 	}
-	Std struct {
+	std struct {
 		Out string
 		Err string
 	}
 	grapeCommandStd struct {
 		Command command
-		Std     Std
+		Std     std
 	}
 )
 
-func (this *grapeSsh) setKey(keyPath keyPath) {
+func (gSSH *grapeSSH) setKey(keyPath keyPath) {
 	privateBytes, err := ioutil.ReadFile(string(keyPath))
 	if err != nil {
 		fatal(fmt.Sprintf("Could not open idendity file."))
@@ -36,31 +36,31 @@ func (this *grapeSsh) setKey(keyPath keyPath) {
 	if err != nil {
 		fatal(fmt.Sprintf("Could not parse idendity file."))
 	}
-	this.keySigner = privateKey
+	gSSH.keySigner = privateKey
 }
 
-func (this *grapeSsh) newClient(server server) grapeSshClient {
+func (gSSH *grapeSSH) newClient(server server) grapeSSHClient {
 	client, err := ssh.Dial("tcp", server.Host, &ssh.ClientConfig{
 		User: server.User,
 		Auth: []ssh.AuthMethod{
-			ssh.PublicKeys(this.keySigner),
+			ssh.PublicKeys(gSSH.keySigner),
 		},
 	})
 	if err != nil {
 		fatal(fmt.Sprintf("Could not establish ssh connection to server [%s].", server.Host))
 	}
-	return grapeSshClient{client}
+	return grapeSSHClient{client}
 }
 
-func (client *grapeSshClient) newSession() *grapeSshSession {
+func (client *grapeSSHClient) newSession() *grapeSSHSession {
 	session, err := client.NewSession()
 	if err != nil {
 		fatal(fmt.Sprintf("Could not establish session [%s].", client.Client.RemoteAddr()))
 	}
-	return &grapeSshSession{session}
+	return &grapeSSHSession{session}
 }
 
-func (session *grapeSshSession) exec(command command) *grapeCommandStd {
+func (session *grapeSSHSession) exec(command command) *grapeCommandStd {
 
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -73,7 +73,7 @@ func (session *grapeSshSession) exec(command command) *grapeCommandStd {
 
 	return &grapeCommandStd{
 		Command: command,
-		Std: Std{
+		Std: std{
 			Err: stderr.String(),
 			Out: stdout.String(),
 		},

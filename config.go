@@ -7,8 +7,8 @@ import (
 )
 
 type (
-	Servers  []server
-	Commands []command
+	servers  []server
+	commands []command
 	command  string
 	server   struct {
 		Name string `yaml:"name"`
@@ -17,31 +17,31 @@ type (
 	}
 	config struct {
 		version  string              `yaml:"version"`
-		Servers  map[string]Servers  `yaml:"servers"`
-		Commands map[string]Commands `yaml:"commands"`
+		Servers  map[string]servers  `yaml:"servers"`
+		Commands map[string]commands `yaml:"commands"`
 	}
 )
 
-func (c *config) set(configPath configPath) {
+func (conf *config) set(configPath configPath) {
 	data, err := ioutil.ReadFile(string(configPath))
 	if err != nil {
 		fatal(fmt.Sprintf("Could not open %s  ", configPath))
 	}
-	if err := yaml.Unmarshal([]byte(data), &c); err != nil {
+	if err := yaml.Unmarshal([]byte(data), &conf); err != nil {
 		fatal(fmt.Sprintf("Could not parse config file. make sure its yaml."))
 	}
 }
 
-func (config *config) getServersFromConfig(serverGroup serverGroup) Servers {
-	group, ok := config.Servers[string(serverGroup)]
+func (conf *config) getServersFromConfig(serverGroup serverGroup) servers {
+	group, ok := conf.Servers[string(serverGroup)]
 	if !ok {
 		fatal(fmt.Sprintf("Could not find [%s] in server group.", serverGroup))
 	}
 	return group
 }
 
-func (config *config) getCommandsFromConfig(commandName commandName) Commands {
-	commands, ok := config.Commands[string(commandName)]
+func (conf *config) getCommandsFromConfig(commandName commandName) commands {
+	commands, ok := conf.Commands[string(commandName)]
 	if !ok {
 		fatal(fmt.Sprintf("Command %s was not found.", commandName))
 	}

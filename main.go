@@ -9,17 +9,17 @@ import (
 type (
 	grape struct {
 		input  input
-		ssh    grapeSsh
+		ssh    grapeSSH
 		config config
 	}
 	serverOutput struct {
-		Server server             `yaml:server`
-		Output []*grapeCommandStd `yaml:stds`
+		Server server             `yaml:"server"`
+		Output []*grapeCommandStd `yaml:"stds"`
 	}
 )
 
 const (
-	WELCOME = `
+	welcome = `
 //      ____ __________ _____  ___  _____
 //     / __  / ___/ __  / __ \/ _ \/ ___/
 //    / /_/ / /  / /_/ / /_/ /  __(__  )
@@ -32,7 +32,7 @@ const (
 var wg sync.WaitGroup
 
 func main() {
-	fmt.Println(WELCOME)
+	fmt.Println(welcome)
 	newGrape().runApp()
 }
 
