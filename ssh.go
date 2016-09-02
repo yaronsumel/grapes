@@ -3,8 +3,8 @@ package main
 import (
 	"io/ioutil"
 	"golang.org/x/crypto/ssh"
-	"log"
 	"bytes"
+	"fmt"
 )
 
 type (
@@ -28,13 +28,13 @@ type (
 )
 
 func (this *grapeSsh)setKey(keyPath keyPath) {
-	privateBytes, err := ioutil.ReadFile(string(*keyPath))
+	privateBytes, err := ioutil.ReadFile(string(keyPath))
 	if err != nil {
-		log.Fatal("setKey", err)
+		fatal(fmt.Sprintf("Could not open idendity file."))
 	}
 	privateKey, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
-		log.Fatal("setKey", err)
+		fatal(fmt.Sprintf("Could not parse idendity file."))
 	}
 	this.keySigner = privateKey
 }
@@ -47,7 +47,7 @@ func (this *grapeSsh)newClient(server server) grapeSshClient {
 		},
 	})
 	if err != nil {
-		panic(err)
+		fatal(fmt.Sprintf("Could not establish ssh connection to server [%s].",server.Host))
 	}
 	return grapeSshClient{client}
 }
@@ -55,7 +55,7 @@ func (this *grapeSsh)newClient(server server) grapeSshClient {
 func (client *grapeSshClient)newSession() *grapeSshSession {
 	session, err := client.NewSession()
 	if err != nil {
-		log.Fatal(err.Error())
+		fatal(fmt.Sprintf("Could not establish session [%s].",client.Client.RemoteAddr()))
 	}
 	return &grapeSshSession{session}
 }
@@ -68,7 +68,7 @@ func (session *grapeSshSession)exec(command command) *grapeCommandStd {
 	session.Stdout = &stdout
 	session.Stderr = &stderr
 
-	session.Run(string(*command))
+	session.Run(string(command))
 	session.Close()
 
 	return &grapeCommandStd{

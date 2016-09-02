@@ -31,7 +31,7 @@ servers:
 commands:
   whats_up :
       - "ls -al /tmp"
-  date :
       - "date"
+  date :
       - "date"
  ```

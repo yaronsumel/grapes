@@ -3,12 +3,13 @@ package main
 import (
 	"io/ioutil"
 	"gopkg.in/yaml.v2"
-	"log"
+	"fmt"
 )
 
 type (
 	Servers []server
 	Commands []command
+	command string
 	server struct {
 		Name string `yaml:"name"`
 		Host string `yaml:"host"`
@@ -22,27 +23,27 @@ type (
 )
 
 func (c *config)set(configPath configPath) {
-	data, err := ioutil.ReadFile(string(*configPath))
+	data, err := ioutil.ReadFile(string(configPath))
 	if err != nil {
-		panic(err)
+		fatal(fmt.Sprintf("Could not open %s  ",configPath))
 	}
 	if err := yaml.Unmarshal([]byte(data), &c); err != nil {
-		log.Fatalf("error: %v", err)
+		fatal(fmt.Sprintf("Could not parse config file. make sure its yaml."))
 	}
 }
 
 func (config *config)getServersFromConfig(serverGroup serverGroup) Servers {
-	group, ok := config.Servers[string(*serverGroup)]
+	group, ok := config.Servers[string(serverGroup)]
 	if !ok {
-		panic("cant find that server group")
+		fatal(fmt.Sprintf("Could not find [%s] in server group.",serverGroup))
 	}
 	return group
 }
 
-func (config *config)getCommandsFromConfig(commandName command) Commands {
-	commands, ok := config.Commands[string(*commandName)]
+func (config *config)getCommandsFromConfig(commandName commandName ) Commands {
+	commands, ok := config.Commands[string(commandName)]
 	if !ok {
-		panic("cant find that command")
+		fatal(fmt.Sprintf("Command %s was not found.",commandName))
 	}
 	return commands
 }
