@@ -10,7 +10,7 @@ grapes is lightweight tool designed to distribute commands over ssh with ease.
 
  Usage Example :
 
-     grapes -c config.yml -i ~/.ssh/id_rsa -s prod -command whats_up
+     grapes -c config.yml -i ~/.ssh/id_rsa -s prod -cmd whats_up
 
 config structure:
 
