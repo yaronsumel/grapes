@@ -19,9 +19,8 @@ $ grapes --help
 //     / __  / ___/ __  / __ \/ _ \/ ___/
 //    / /_/ / /  / /_/ / /_/ /  __(__  )
 //    \__, /_/   \__,_/ .___/\___/____/
-//   /____/          /_/
+//   /____/          /_/ v 0.1.2 // Yaron Sumel [yaronsu@gmail.com]
 //
-// Version 0.1.1 -- Yaron Sumel [yaronsu@gmail.com]
 
 Usage of grapes:
   -async
