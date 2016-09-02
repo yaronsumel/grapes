@@ -22,7 +22,7 @@ type input struct {
 
 func (input *input) parse() {
 
-	asyncFlagPtr := flag.Bool("async", false,"async - when true, parallel executing over servers")
+	asyncFlagPtr := flag.Bool("async", false, "async - when true, parallel executing over servers")
 	configPathPtr := flag.String("c", "", "config file - yaml config file")
 	keyPathPtr := flag.String("i", "", "identity file - path to private key")
 	serverGroupPtr := flag.String("s", "", "server group - name of the server group")
