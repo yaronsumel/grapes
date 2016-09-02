@@ -1,9 +1,9 @@
 package main
 
 import (
-	"sync"
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"sync"
 )
 
 type (
@@ -13,7 +13,7 @@ type (
 		config config
 	}
 	serverOutput struct {
-		Server server `yaml:server`
+		Server server             `yaml:server`
 		Output []*grapeCommandStd `yaml:stds`
 	}
 )
@@ -48,7 +48,7 @@ func newGrape() *grape {
 	return &grape
 }
 
-func (app *grape)runApp() {
+func (app *grape) runApp() {
 	servers := app.config.getServersFromConfig(app.input.serverGroup)
 	//todo verify action
 	for _, server := range servers {
@@ -64,20 +64,20 @@ func (app *grape)runApp() {
 	}
 }
 
-func (app *grape)asyncRunCommand(server server, wg *sync.WaitGroup) {
+func (app *grape) asyncRunCommand(server server, wg *sync.WaitGroup) {
 	app.runCommandsOnServer(server)
 	wg.Done()
 }
 
-func (app *grape)runCommandsOnServer(server server) {
+func (app *grape) runCommandsOnServer(server server) {
 
 	commands := app.config.getCommandsFromConfig(app.input.commandName)
 	client := app.ssh.newClient(server)
 	so := serverOutput{
-		Server:server,
+		Server: server,
 	}
 
-	for _, command := range commands{
+	for _, command := range commands {
 		so.Output = append(so.Output, client.newSession().exec(command))
 	}
 
@@ -85,9 +85,9 @@ func (app *grape)runCommandsOnServer(server server) {
 	so.print()
 }
 
-func (so *serverOutput)print(){
+func (so *serverOutput) print() {
 	out, err := yaml.Marshal(so)
-	if err!=nil{
+	if err != nil {
 		fatal("something went wrong with the output")
 	}
 	fmt.Println(string(out))

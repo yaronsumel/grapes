@@ -21,28 +21,28 @@ type input struct {
 }
 
 const (
-	FLAG_ASYNC_KEY = "async"
+	FLAG_ASYNC_KEY  = "async"
 	FLAG_ASYNC_DESC = "async - when true, parallel executing over servers"
-	FLAG_ASYNC_DEF = false
+	FLAG_ASYNC_DEF  = false
 
-	FLAG_CONFIG_PATH_KEY = "c"
+	FLAG_CONFIG_PATH_KEY  = "c"
 	FLAG_CONFIG_PATH_DESC = "config file - yaml config file"
-	FLAG_CONFIG_PATH_DEF = ""
+	FLAG_CONFIG_PATH_DEF  = ""
 
-	FLAG_KEY_PATH_KEY = "i"
+	FLAG_KEY_PATH_KEY  = "i"
 	FLAG_KEY_PATH_DESC = "identity file - path to private key"
-	FLAG_KEY_PATH_DEF = ""
+	FLAG_KEY_PATH_DEF  = ""
 
-	FLAG_GROUP_KEY = "s"
+	FLAG_GROUP_KEY  = "s"
 	FLAG_GROUP_DESC = "server group - name of the server group"
-	FLAG_GROUP_DEF = ""
+	FLAG_GROUP_DEF  = ""
 
-	FLAG_COMMAND_KEY = "cmd"
+	FLAG_COMMAND_KEY  = "cmd"
 	FLAG_COMMAND_DESC = "command name - name of the command to run"
-	FLAG_COMMAND_DEF = ""
+	FLAG_COMMAND_DEF  = ""
 )
 
-func (this *input)parse() {
+func (this *input) parse() {
 
 	asyncFlagPtr := flag.Bool(FLAG_ASYNC_KEY, FLAG_ASYNC_DEF, FLAG_ASYNC_DESC)
 	configPathPtr := flag.String(FLAG_CONFIG_PATH_KEY, FLAG_CONFIG_PATH_DEF, FLAG_CONFIG_PATH_DESC)
@@ -60,32 +60,32 @@ func (this *input)parse() {
 
 }
 
-func (this *input)validate() {
+func (this *input) validate() {
 	this.configPath.validate()
 	this.keyPath.validate()
 	this.serverGroup.validate()
 	this.commandName.validate()
 }
 
-func (val *configPath)validate() {
+func (val *configPath) validate() {
 	if *val == "" {
 		fatal("configPath is empty please set grapes -c config.yml")
 	}
 }
 
-func (val *keyPath)validate() {
+func (val *keyPath) validate() {
 	if *val == "" {
 		fatal("idendity file path is empty please set grapes -i ~/.ssh/id_rsaa")
 	}
 }
 
-func (val *serverGroup)validate() {
+func (val *serverGroup) validate() {
 	if *val == "" {
 		fatal("server group is empty please set grapes -s server_group")
 	}
 }
 
-func (val *commandName)validate() {
+func (val *commandName) validate() {
 	if *val == "" {
 		fatal("command name is empty please set grapes -command whats_up")
 	}

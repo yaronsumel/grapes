@@ -1,10 +1,10 @@
 package main
 
 import (
-	"io/ioutil"
-	"golang.org/x/crypto/ssh"
 	"bytes"
 	"fmt"
+	"golang.org/x/crypto/ssh"
+	"io/ioutil"
 )
 
 type (
@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func (this *grapeSsh)setKey(keyPath keyPath) {
+func (this *grapeSsh) setKey(keyPath keyPath) {
 	privateBytes, err := ioutil.ReadFile(string(keyPath))
 	if err != nil {
 		fatal(fmt.Sprintf("Could not open idendity file."))
@@ -39,7 +39,7 @@ func (this *grapeSsh)setKey(keyPath keyPath) {
 	this.keySigner = privateKey
 }
 
-func (this *grapeSsh)newClient(server server) grapeSshClient {
+func (this *grapeSsh) newClient(server server) grapeSshClient {
 	client, err := ssh.Dial("tcp", server.Host, &ssh.ClientConfig{
 		User: server.User,
 		Auth: []ssh.AuthMethod{
@@ -47,20 +47,20 @@ func (this *grapeSsh)newClient(server server) grapeSshClient {
 		},
 	})
 	if err != nil {
-		fatal(fmt.Sprintf("Could not establish ssh connection to server [%s].",server.Host))
+		fatal(fmt.Sprintf("Could not establish ssh connection to server [%s].", server.Host))
 	}
 	return grapeSshClient{client}
 }
 
-func (client *grapeSshClient)newSession() *grapeSshSession {
+func (client *grapeSshClient) newSession() *grapeSshSession {
 	session, err := client.NewSession()
 	if err != nil {
-		fatal(fmt.Sprintf("Could not establish session [%s].",client.Client.RemoteAddr()))
+		fatal(fmt.Sprintf("Could not establish session [%s].", client.Client.RemoteAddr()))
 	}
 	return &grapeSshSession{session}
 }
 
-func (session *grapeSshSession)exec(command command) *grapeCommandStd {
+func (session *grapeSshSession) exec(command command) *grapeCommandStd {
 
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -72,10 +72,10 @@ func (session *grapeSshSession)exec(command command) *grapeCommandStd {
 	session.Close()
 
 	return &grapeCommandStd{
-		Command:command,
-		Std:Std{
-			Err:stderr.String(),
-			Out:stdout.String(),
+		Command: command,
+		Std: Std{
+			Err: stderr.String(),
+			Out: stdout.String(),
 		},
 	}
 

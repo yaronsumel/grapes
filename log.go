@@ -6,6 +6,6 @@ import (
 )
 
 func fatal(data string) {
-		fmt.Printf("\r\nFatal: %s \n\n" ,data)
-		os.Exit(1)
+	fmt.Printf("\r\nFatal: %s \n\n", data)
+	os.Exit(1)
 }
