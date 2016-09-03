@@ -16,7 +16,7 @@ type (
 		User string `yaml:"user"`
 	}
 	config struct {
-		version  string              `yaml:"version"`
+		Version  string              `yaml:"version"`
 		Servers  map[string]servers  `yaml:"servers"`
 		Commands map[string]commands `yaml:"commands"`
 	}
