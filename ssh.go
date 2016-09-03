@@ -60,7 +60,9 @@ func (client *grapeSSHClient) newSession() *grapeSSHSession {
 	return &grapeSSHSession{session}
 }
 
-func (session *grapeSSHSession) exec(command command) *grapeCommandStd {
+func (client *grapeSSHClient) exec(command command) *grapeCommandStd {
+
+	session := client.newSession()
 
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer

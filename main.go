@@ -19,12 +19,13 @@ type (
 )
 
 const (
+	version = "0.1.4"
 	welcome = `
 //      ____ __________ _____  ___  _____
 //     / __  / ___/ __  / __ \/ _ \/ ___/
 //    / /_/ / /  / /_/ / /_/ /  __(__  )
 //    \__, /_/   \__,_/ .___/\___/____/
-//   /____/          /_/ v 0.1.3 // Yaron Sumel [yaronsu@gmail.com]
+//   /____/          /_/ v %s // Yaron Sumel [yaronsu@gmail.com]
 //
 `
 )
@@ -32,7 +33,7 @@ const (
 var wg sync.WaitGroup
 
 func main() {
-	fmt.Println(welcome)
+	fmt.Printf(welcome, version)
 	newGrape().runApp()
 }
 
@@ -75,12 +76,13 @@ func (app *grape) runCommandsOnServer(server server) {
 
 	commands := app.config.getCommandsFromConfig(app.input.commandName)
 	client := app.ssh.newClient(server)
+
 	so := serverOutput{
 		Server: server,
 	}
 
 	for _, command := range commands {
-		so.Output = append(so.Output, client.newSession().exec(command))
+		so.Output = append(so.Output, client.exec(command))
 	}
 
 	//done with all commands for this server
