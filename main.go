@@ -24,7 +24,7 @@ const (
 //     / __  / ___/ __  / __ \/ _ \/ ___/
 //    / /_/ / /  / /_/ / /_/ /  __(__  )
 //    \__, /_/   \__,_/ .___/\___/____/
-//   /____/          /_/ v 0.1.2 // Yaron Sumel [yaronsu@gmail.com]
+//   /____/          /_/ v 0.1.3 // Yaron Sumel [yaronsu@gmail.com]
 //
 `
 )
@@ -49,8 +49,10 @@ func newGrape() *grape {
 }
 
 func (app *grape) runApp() {
+
 	servers := app.config.getServersFromConfig(app.input.serverGroup)
-	//todo verify action
+	app.input.verifyAction(servers)
+
 	for _, server := range servers {
 		if app.input.asyncFlag {
 			wg.Add(1)

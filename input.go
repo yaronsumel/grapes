@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 )
 
 type (
@@ -10,6 +11,7 @@ type (
 	keyPath     string
 	serverGroup string
 	commandName string
+	verifyFlag  bool
 )
 
 type input struct {
@@ -18,10 +20,12 @@ type input struct {
 	keyPath     keyPath
 	serverGroup serverGroup
 	commandName commandName
+	verifyFlag  verifyFlag
 }
 
 func (input *input) parse() {
 
+	verifyActionFlagPtr := flag.Bool("y", false, "force yes")
 	asyncFlagPtr := flag.Bool("async", false, "async - when true, parallel executing over servers")
 	configPathPtr := flag.String("c", "", "config file - yaml config file")
 	keyPathPtr := flag.String("i", "", "identity file - path to private key")
@@ -30,6 +34,7 @@ func (input *input) parse() {
 
 	flag.Parse()
 
+	input.verifyFlag = verifyFlag(*verifyActionFlagPtr)
 	input.asyncFlag = asyncFlag(*asyncFlagPtr)
 	input.commandName = commandName(*commandPtr)
 	input.serverGroup = serverGroup(*serverGroupPtr)
@@ -66,5 +71,25 @@ func (val *serverGroup) validate() {
 func (val *commandName) validate() {
 	if *val == "" {
 		fatal("command name is empty please set grapes -cmd whats_up")
+	}
+}
+
+func (input *input) verifyAction(servers servers) {
+
+	var char = "n"
+	fmt.Printf("command [%s] will run on the following servers:\n", input.commandName)
+
+	for k, v := range servers {
+		fmt.Printf("\t#%d - %s [%s@%s] \n", k, v.Name, v.User, v.Host)
+	}
+
+	if input.verifyFlag {
+		fmt.Println("-y used.forced to continue.")
+		return
+	}
+
+	fmt.Print("\n -- are your sure? [y/N] : ")
+	if _, err := fmt.Scanf("%s", &char); err != nil || char != "y" {
+		fatal("type y to continue")
 	}
 }
