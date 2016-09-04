@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"os"
 	"sync"
 )
 
@@ -19,7 +20,7 @@ type (
 )
 
 const (
-	version = "0.1.4"
+	version = "0.1.5"
 	welcome = `
 //      ____ __________ _____  ___  _____
 //     / __  / ___/ __  / __ \/ _ \/ ___/
@@ -95,4 +96,9 @@ func (so *serverOutput) print() {
 		fatal("something went wrong with the output")
 	}
 	fmt.Println(string(out))
+}
+
+func fatal(data string) {
+	fmt.Printf("\r\nFatal: %s \n\n", data)
+	os.Exit(1)
 }
