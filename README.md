@@ -46,3 +46,5 @@ commands:
   date :
       - "date"
  ```
+ 
+> ##### Written and Maintained by [@YaronSumel](https://twitter.com/yaronsumel) #####
