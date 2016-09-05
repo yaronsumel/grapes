@@ -2,8 +2,9 @@
 
 grapes is lightweight tool designed to distribute commands over ssh with ease.
 
- Installation and usage
- ----------------------
+#### Latest Binaries [Windows](https://github.com/yaronsumel/grapes/releases/download/v0.2/win-grapes.zip), [Mac](https://github.com/yaronsumel/grapes/releases/download/v0.2/darwin-grapes.zip), [Linux](https://github.com/yaronsumel/grapes/releases/download/v0.2/linux-grapes.7z) ####
+ 
+#### Installation and usage ####
 
  To install it, run:
 
