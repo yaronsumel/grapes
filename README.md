@@ -22,7 +22,7 @@ grapes is lightweight tool designed to distribute commands over ssh with ease.
 
 * use the --help flag for full usage output.
 
-### config ###
+### Config ###
 
 config structure (YAML):
 
