@@ -20,7 +20,7 @@ $ grapes --help
 //     / __  / ___/ __  / __ \/ _ \/ ___/
 //    / /_/ / /  / /_/ / /_/ /  __(__  )
 //    \__, /_/   \__,_/ .___/\___/____/
-//   /____/          /_/ v 0.1.3 // Yaron Sumel [yaronsu@gmail.com]
+//   /____/          /_/ v 0.1.6 // Yaron Sumel [yaronsu@gmail.com]
 //
 
 Usage of ./grapes:
