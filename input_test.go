@@ -4,21 +4,21 @@ import (
 	"testing"
 )
 
-var demoInputOk input = input{
-	asyncFlag:asyncFlag(false),
-	configPath:configPath("/demo"),
-	keyPath:keyPath("/demo"),
-	serverGroup:serverGroup("demoServerGroup"),
-	commandName:commandName("demo"),
-	verifyFlag:verifyFlag(false),
+var demoInputOk = input{
+	asyncFlag:   asyncFlag(false),
+	configPath:  configPath("/demo"),
+	keyPath:     keyPath("/demo"),
+	serverGroup: serverGroup("demoServerGroup"),
+	commandName: commandName("demo"),
+	verifyFlag:  verifyFlag(false),
 }
 
-var demoInputNotOk input = input{
-	asyncFlag:asyncFlag(false),
-	configPath:configPath(""),
-	keyPath:keyPath(""),
-	serverGroup:serverGroup(""),
-	verifyFlag:verifyFlag(true),
+var demoInputNotOk = input{
+	asyncFlag:   asyncFlag(false),
+	configPath:  configPath(""),
+	keyPath:     keyPath(""),
+	serverGroup: serverGroup(""),
+	verifyFlag:  verifyFlag(true),
 }
 
 func TestParse(t *testing.T) {
@@ -141,9 +141,9 @@ func TestVerifyAction(t *testing.T) {
 
 	s := servers{
 		server{
-			Name:"testN",
-			Host:"testH",
-			User:"testU",
+			Name: "testN",
+			Host: "testH",
+			User: "testU",
 		},
 	}
 
@@ -168,6 +168,5 @@ func TestVerifyAction(t *testing.T) {
 		demoInputOk.verifyFlag = true
 		demoInputOk.verifyAction(s)
 	}()
-
 
 }

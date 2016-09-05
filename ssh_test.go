@@ -29,7 +29,6 @@ func TestSetKey(t *testing.T) {
 		t.FailNow()
 	}()
 
-
 	//should panic
 	func() {
 		defer func() {
@@ -50,9 +49,9 @@ func TestNewClient(t *testing.T) {
 	gSSH.setKey("testFiles/id_rsa")
 
 	s := server{
-		Host:"sdf.org:22",
-		User:"new",
-		Name:"public",
+		Host: "sdf.org:22",
+		User: "new",
+		Name: "public",
 	}
 
 	//should not panic
@@ -83,9 +82,9 @@ func TestNewSession(t *testing.T) {
 	gSSH.setKey("testFiles/id_rsa")
 
 	s := server{
-		Host:"sdf.org:22",
-		User:"new",
-		Name:"public",
+		Host: "sdf.org:22",
+		User: "new",
+		Name: "public",
 	}
 
 	client := gSSH.newClient(s)
@@ -119,9 +118,9 @@ func TestExec(t *testing.T) {
 	gSSH.setKey("testFiles/id_rsa")
 
 	s := server{
-		Host:"sdf.org:22",
-		User:"new",
-		Name:"public",
+		Host: "sdf.org:22",
+		User: "new",
+		Name: "public",
 	}
 
 	client := gSSH.newClient(s)

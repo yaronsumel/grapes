@@ -20,7 +20,6 @@ func TestRunApp(t *testing.T) {
 	app.config.set("testFiles/demo_config.yml")
 	app.ssh.setKey(keyPath("testFiles/id_rsa"))
 
-
 	//should not panic
 	func() {
 		defer func() {
@@ -49,26 +48,25 @@ func TestRunApp(t *testing.T) {
 func TestPrint(t *testing.T) {
 
 	s := server{
-		Host:"sdf.org:22",
-		User:"new",
-		Name:"public",
+		Host: "sdf.org:22",
+		User: "new",
+		Name: "public",
 	}
 
 	x := grapeCommandStd{
-		Command:"a",
-		Std:std{
-			Err:"",
-			Out:"",
+		Command: "a",
+		Std: std{
+			Err: "",
+			Out: "",
 		},
 	}
 
-
 	so := serverOutput{
-		Server:s,
-		Output:[]*grapeCommandStd{
+		Server: s,
+		Output: []*grapeCommandStd{
 			&x,
-			},
-		}
+		},
+	}
 
 	func() {
 		defer func() {
