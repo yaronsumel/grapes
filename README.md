@@ -2,15 +2,21 @@
 
 grapes is lightweight tool designed to distribute commands over ssh with ease.
 
-> ##### Latest Binaries [Windows](https://github.com/yaronsumel/grapes/releases/download/v0.2/win-grapes.zip), [Mac](https://github.com/yaronsumel/grapes/releases/download/v0.2/darwin-grapes.zip), [Linux](https://github.com/yaronsumel/grapes/releases/download/v0.2/linux-grapes.7z) #####
- 
-### Installation and usage ###
+### Installation ###
 
- To install it, run:
+ grab binary or run (golang required):
 
      $ go get -u github.com/yaronsumel/grapes
 
- Usage Example :
+> Os  | Binary | md5sum
+> ------------- | ------------- | -------------
+> windows  | [download](https://github.com/yaronsumel/grapes/releases/download/v0.2/win-grapes.zip) | b18c8e4f511329e5d4b9a27bd8aa52c7
+> linux  | [download](https://github.com/yaronsumel/grapes/releases/download/v0.2/linux-grapes.7z) | 60734d1004c9266f2cc4987453262931
+> darwin  | [download](https://github.com/yaronsumel/grapes/releases/download/v0.2/darwin-grapes.zip) | d89264f774f50a39379ec46c1865e286
+
+### Usage ###
+
+ Example :
 
      $ grapes -c config.yml -i ~/.ssh/id_rsa -s prod -cmd whats_up
 
@@ -37,6 +43,8 @@ Usage of ./grapes:
         server group - name of the server group
   -y    force yes
 ```
+
+### config ###
 
 config structure (YAML):
 
