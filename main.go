@@ -20,7 +20,7 @@ type (
 )
 
 const (
-	version = "0.2"
+	version = "0.2.1"
 	welcome = `
 //      ____ __________ _____  ___  _____
 //     / __  / ___/ __  / __ \/ _ \/ ___/
@@ -38,12 +38,7 @@ var (
 
 func main() {
 
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Printf("\r\nFatal: %s \n\n", err)
-			os.Exit(1)
-		}
-	}()
+	defer recoverFromPanic(true)
 
 	fmt.Printf(welcome, version)
 
@@ -56,6 +51,16 @@ func main() {
 	app.config.set(app.input.configPath)
 
 	app.runApp()
+}
+
+func recoverFromPanic(exitOnError bool) {
+	if err := recover(); err != nil {
+		if exitOnError {
+			fmt.Printf("\r\nFatal: %s \n\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("\r\nError: %s \n\n", err)
+	}
 }
 
 func (app *grape) runApp() {
@@ -77,8 +82,9 @@ func (app *grape) runApp() {
 }
 
 func (app *grape) asyncRunCommand(server server, wg *sync.WaitGroup) {
+	defer recoverFromPanic(false)
+	defer wg.Done()
 	app.runCommandsOnServer(server)
-	wg.Done()
 }
 
 func (app *grape) runCommandsOnServer(server server) {

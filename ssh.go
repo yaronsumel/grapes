@@ -47,7 +47,7 @@ func (gSSH *grapeSSH) newClient(server server) grapeSSHClient {
 		},
 	})
 	if err != nil {
-		panic(fmt.Sprintf("Could not establish ssh connection to server [%s].", server.Host))
+		panic(fmt.Sprintf("Could not establish ssh connection to %s [%s].", server.Name, server.Host))
 	}
 	return grapeSSHClient{client}
 }
