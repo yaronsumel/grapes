@@ -16,33 +16,11 @@ grapes is lightweight tool designed to distribute commands over ssh with ease.
 
 ### Usage ###
 
- Example :
+ Example:
 
-     $ grapes -c config.yml -i ~/.ssh/id_rsa -s prod -cmd whats_up
+     $ grapes -c config.yml -i ~/.ssh/id_rsa -s prod -cmd whats_up --async
 
-```
-$ grapes --help 
-
-//      ____ __________ _____  ___  _____
-//     / __  / ___/ __  / __ \/ _ \/ ___/
-//    / /_/ / /  / /_/ / /_/ /  __(__  )
-//    \__, /_/   \__,_/ .___/\___/____/
-//   /____/          /_/ v 0.1.6 // Yaron Sumel [yaronsu@gmail.com]
-//
-
-Usage of ./grapes:
-  -async
-        async - when true, parallel executing over servers
-  -c string
-        config file - yaml config file
-  -cmd string
-        command name - name of the command to run
-  -i string
-        identity file - path to private key
-  -s string
-        server group - name of the server group
-  -y    force yes
-```
+* use the --help flag for full usage output.
 
 ### config ###
 
