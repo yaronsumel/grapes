@@ -25,17 +25,17 @@ type (
 func (conf *config) set(configPath configPath) {
 	data, err := ioutil.ReadFile(string(configPath))
 	if err != nil {
-		fatal(fmt.Sprintf("Could not open %s  ", configPath))
+		panic(fmt.Sprintf("Could not open %s  ", configPath))
 	}
 	if err := yaml.Unmarshal([]byte(data), &conf); err != nil {
-		fatal(fmt.Sprintf("Could not parse config file. make sure its yaml."))
+		panic(fmt.Sprintf("Could not parse config file. make sure its yaml."))
 	}
 }
 
 func (conf *config) getServersFromConfig(serverGroup serverGroup) servers {
 	group, ok := conf.Servers[string(serverGroup)]
 	if !ok {
-		fatal(fmt.Sprintf("Could not find [%s] in server group.", serverGroup))
+		panic(fmt.Sprintf("Could not find [%s] in server group.", serverGroup))
 	}
 	return group
 }
@@ -43,7 +43,7 @@ func (conf *config) getServersFromConfig(serverGroup serverGroup) servers {
 func (conf *config) getCommandsFromConfig(commandName commandName) commands {
 	commands, ok := conf.Commands[string(commandName)]
 	if !ok {
-		fatal(fmt.Sprintf("Command %s was not found.", commandName))
+		panic(fmt.Sprintf("Command %s was not found.", commandName))
 	}
 	return commands
 }

@@ -30,11 +30,11 @@ type (
 func (gSSH *grapeSSH) setKey(keyPath keyPath) {
 	privateBytes, err := ioutil.ReadFile(string(keyPath))
 	if err != nil {
-		fatal(fmt.Sprintf("Could not open idendity file."))
+		panic(fmt.Sprintf("Could not open idendity file."))
 	}
 	privateKey, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
-		fatal(fmt.Sprintf("Could not parse idendity file."))
+		panic(fmt.Sprintf("Could not parse idendity file."))
 	}
 	gSSH.keySigner = privateKey
 }
@@ -47,7 +47,7 @@ func (gSSH *grapeSSH) newClient(server server) grapeSSHClient {
 		},
 	})
 	if err != nil {
-		fatal(fmt.Sprintf("Could not establish ssh connection to server [%s].", server.Host))
+		panic(fmt.Sprintf("Could not establish ssh connection to server [%s].", server.Host))
 	}
 	return grapeSSHClient{client}
 }
@@ -55,7 +55,7 @@ func (gSSH *grapeSSH) newClient(server server) grapeSSHClient {
 func (client *grapeSSHClient) newSession() *grapeSSHSession {
 	session, err := client.NewSession()
 	if err != nil {
-		fatal(fmt.Sprintf("Could not establish session [%s].", client.Client.RemoteAddr()))
+		panic(fmt.Sprintf("Could not establish session [%s].", client.Client.RemoteAddr()))
 	}
 	return &grapeSSHSession{session}
 }

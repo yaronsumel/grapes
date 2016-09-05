@@ -1,8 +1,6 @@
 package main
 
 import (
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"reflect"
 	"testing"
 )
@@ -34,20 +32,42 @@ func getDemoConfig() config {
 var demoConfig = getDemoConfig()
 
 func TestSet(t *testing.T) {
-	testPath := configPath("demo_config.yml")
-	c1 := config{}
-	c2 := config{}
-	c1.set(testPath)
-	data, err := ioutil.ReadFile(string(testPath))
-	if err != nil {
+
+	//should not panic
+	func() {
+		defer func() {
+			if err := recover(); err != nil {
+				t.FailNow()
+			}
+		}()
+		cOk := config{}
+		cOk.set(configPath("testFiles/demo_config.yml"))
+	}()
+
+	//should panic
+	func() {
+		defer func() {
+			if err := recover(); err != nil {
+				recover()
+			}
+		}()
+		cNotOk := config{}
+		cNotOk.set(configPath("not_demo_config.yml"))
 		t.FailNow()
-	}
-	if err := yaml.Unmarshal([]byte(data), &c2); err != nil {
+	}()
+
+	//should panic
+	func() {
+		defer func() {
+			if err := recover(); err != nil {
+				recover()
+			}
+		}()
+		cNotOk1 := config{}
+		cNotOk1.set(configPath("main.go"))
 		t.FailNow()
-	}
-	if !reflect.DeepEqual(c1, c2) {
-		t.FailNow()
-	}
+	}()
+
 }
 
 func TestGetServersFromConfig(t *testing.T) {
@@ -56,6 +76,18 @@ func TestGetServersFromConfig(t *testing.T) {
 	if !reflect.DeepEqual(demoConfig.Servers["test1"], serversArray) {
 		t.FailNow()
 	}
+
+	//should panic
+	func() {
+		defer func() {
+			if err := recover(); err != nil {
+				recover()
+			}
+		}()
+		demoConfig.getServersFromConfig(serverGroup("false_group_name"))
+		t.FailNow()
+	}()
+
 }
 
 func TestGetCommandsFromConfig(t *testing.T) {
@@ -64,4 +96,14 @@ func TestGetCommandsFromConfig(t *testing.T) {
 	if !reflect.DeepEqual(demoConfig.Commands["test_cmd"], cmds) {
 		t.FailNow()
 	}
+	//should panic
+	func() {
+		defer func() {
+			if err := recover(); err != nil {
+				recover()
+			}
+		}()
+		demoConfig.getCommandsFromConfig(commandName("false_command"))
+		t.FailNow()
+	}()
 }

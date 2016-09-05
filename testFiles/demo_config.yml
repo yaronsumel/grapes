@@ -2,8 +2,8 @@ version: 1
 servers:
   prod :
       - name : "prod server #1"
-        host : "localhost:22"
-        user : "root"
+        host : "sdf.org:22"
+        user : "new"
   staging :
       - name : "staging server #1"
         host : "localhost:22"
@@ -13,7 +13,6 @@ servers:
         user : "ubuntu"
 commands:
   whats_up :
-      - "ls -al /tmp"
       - "date"
       - "date"
   date :

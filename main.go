@@ -31,23 +31,31 @@ const (
 `
 )
 
-var wg sync.WaitGroup
+var (
+	wg  sync.WaitGroup
+	app grape
+)
 
 func main() {
+
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("\r\nFatal: %s \n\n", err)
+			os.Exit(1)
+		}
+	}()
+
 	fmt.Printf(welcome, version)
-	newGrape().runApp()
-}
 
-func newGrape() *grape {
-	grape := grape{}
-	//parse flags and validate it
-	grape.input.parse()
-	grape.input.validate()
+	app.input.parse()
 
-	grape.ssh.setKey(grape.input.keyPath)
-	grape.config.set(grape.input.configPath)
+	app.input.validate()
 
-	return &grape
+	app.ssh.setKey(app.input.keyPath)
+
+	app.config.set(app.input.configPath)
+
+	app.runApp()
 }
 
 func (app *grape) runApp() {
@@ -93,12 +101,7 @@ func (app *grape) runCommandsOnServer(server server) {
 func (so *serverOutput) print() {
 	out, err := yaml.Marshal(so)
 	if err != nil {
-		fatal("something went wrong with the output")
+		panic("something went wrong with the output")
 	}
 	fmt.Println(string(out))
-}
-
-func fatal(data string) {
-	fmt.Printf("\r\nFatal: %s \n\n", data)
-	os.Exit(1)
 }

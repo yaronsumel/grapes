@@ -12,16 +12,16 @@ type (
 	serverGroup string
 	commandName string
 	verifyFlag  bool
-)
 
-type input struct {
-	asyncFlag   asyncFlag
-	configPath  configPath
-	keyPath     keyPath
-	serverGroup serverGroup
-	commandName commandName
-	verifyFlag  verifyFlag
-}
+	input struct {
+		asyncFlag   asyncFlag
+		configPath  configPath
+		keyPath     keyPath
+		serverGroup serverGroup
+		commandName commandName
+		verifyFlag  verifyFlag
+	}
+)
 
 func (input *input) parse() {
 
@@ -52,25 +52,25 @@ func (input *input) validate() {
 
 func (val *configPath) validate() {
 	if *val == "" {
-		fatal("configPath is empty please set grapes -c config.yml")
+		panic("configPath is empty please set grapes -c config.yml")
 	}
 }
 
 func (val *keyPath) validate() {
 	if *val == "" {
-		fatal("idendity file path is empty please set grapes -i ~/.ssh/id_rsaa")
+		panic("idendity file path is empty please set grapes -i ~/.ssh/id_rsaa")
 	}
 }
 
 func (val *serverGroup) validate() {
 	if *val == "" {
-		fatal("server group is empty please set grapes -s server_group")
+		panic("server group is empty please set grapes -s server_group")
 	}
 }
 
 func (val *commandName) validate() {
 	if *val == "" {
-		fatal("command name is empty please set grapes -cmd whats_up")
+		panic("command name is empty please set grapes -cmd whats_up")
 	}
 }
 
@@ -90,6 +90,6 @@ func (input *input) verifyAction(servers servers) {
 
 	fmt.Print("\n -- are your sure? [y/N] : ")
 	if _, err := fmt.Scanf("%s", &char); err != nil || char != "y" {
-		fatal("type y to continue")
+		panic("type y to continue")
 	}
 }
