@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 )
@@ -21,6 +22,7 @@ type (
 		commandName commandName
 		verifyFlag  verifyFlag
 	}
+	inputError error
 )
 
 func (input *input) parse() {
@@ -43,35 +45,52 @@ func (input *input) parse() {
 
 }
 
-func (input *input) validate() {
-	input.configPath.validate()
-	input.keyPath.validate()
-	input.serverGroup.validate()
-	input.commandName.validate()
+func (input *input) newError(errMsg string) inputError {
+	return errors.New(errMsg)
 }
 
-func (val *configPath) validate() {
-	if *val == "" {
-		panic("configPath is empty please set grapes -c config.yml")
+func (input *input) validate() inputError {
+	if err := input.configPath.validate(input); err != nil {
+		return err
 	}
+	if err := input.keyPath.validate(input); err != nil {
+		return err
+	}
+	if err := input.serverGroup.validate(input); err != nil {
+		return err
+	}
+	if err := input.commandName.validate(input); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (val *keyPath) validate() {
+func (val *configPath) validate(input *input) inputError {
 	if *val == "" {
-		panic("idendity file path is empty please set grapes -i ~/.ssh/id_rsaa")
+		return input.newError("configPath is empty please set grapes -c config.yml")
 	}
+	return nil
 }
 
-func (val *serverGroup) validate() {
+func (val *keyPath) validate(input *input) inputError {
 	if *val == "" {
-		panic("server group is empty please set grapes -s server_group")
+		return input.newError("idendity file path is empty please set grapes -i ~/.ssh/id_rsaa")
 	}
+	return nil
 }
 
-func (val *commandName) validate() {
+func (val *serverGroup) validate(input *input) inputError {
 	if *val == "" {
-		panic("command name is empty please set grapes -cmd whats_up")
+		return input.newError("server group is empty please set grapes -s server_group")
 	}
+	return nil
+}
+
+func (val *commandName) validate(input *input) inputError {
+	if *val == "" {
+		return input.newError("command name is empty please set grapes -cmd whats_up")
+	}
+	return nil
 }
 
 func (input *input) verifyAction(servers servers) {

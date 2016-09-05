@@ -32,78 +32,42 @@ func getDemoConfig() config {
 var demoConfig = getDemoConfig()
 
 func TestSet(t *testing.T) {
-
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		cOk := config{}
-		cOk.set(configPath("testFiles/demo_config.yml"))
-	}()
-
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		cNotOk := config{}
-		cNotOk.set(configPath("not_demo_config.yml"))
+	cOk := config{}
+	if cOk.set(configPath("testFiles/demo_config.yml")) != nil {
 		t.FailNow()
-	}()
-
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		cNotOk1 := config{}
-		cNotOk1.set(configPath("main.go"))
+	}
+	cNotOk := config{}
+	if cNotOk.set(configPath("not_demo_config.yml")) == nil {
 		t.FailNow()
-	}()
-
+	}
+	cNotOk1 := config{}
+	if cNotOk1.set(configPath("main.go")) == nil {
+		t.FailNow()
+	}
 }
 
 func TestGetServersFromConfig(t *testing.T) {
-	groupName := "test1"
-	serversArray := demoConfig.getServersFromConfig(serverGroup(groupName))
+	serversArray, err := demoConfig.getServersFromConfig(serverGroup("test1"))
+	if err != nil {
+		t.FailNow()
+	}
 	if !reflect.DeepEqual(demoConfig.Servers["test1"], serversArray) {
 		t.FailNow()
 	}
-
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoConfig.getServersFromConfig(serverGroup("false_group_name"))
+	if _, err = demoConfig.getServersFromConfig(serverGroup("false_group_name")); err == nil {
 		t.FailNow()
-	}()
-
+	}
 }
 
 func TestGetCommandsFromConfig(t *testing.T) {
-	cmdName := "test_cmd"
-	cmds := demoConfig.getCommandsFromConfig(commandName(cmdName))
+	cmds, err := demoConfig.getCommandsFromConfig(commandName("test_cmd"))
+	if err != nil {
+		t.FailNow()
+	}
 	if !reflect.DeepEqual(demoConfig.Commands["test_cmd"], cmds) {
 		t.FailNow()
 	}
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoConfig.getCommandsFromConfig(commandName("false_command"))
+	if _, err := demoConfig.getCommandsFromConfig(commandName("false_command")); err == nil {
 		t.FailNow()
-	}()
+	}
 }
