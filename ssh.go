@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
@@ -14,32 +15,36 @@ type (
 	grapeSSHClient struct {
 		*ssh.Client
 	}
-	grapeSSHSession struct {
-		*ssh.Session
-	}
 	std struct {
 		Out string
 		Err string
 	}
-	grapeCommandStd struct {
+	sshOutput struct {
 		Command command
 		Std     std
 	}
+	sshOutputArray []*sshOutput
+	sshError       error
 )
 
-func (gSSH *grapeSSH) setKey(keyPath keyPath) {
+func (gSSH *grapeSSH) newError(errMsg string) sshError {
+	return errors.New(errMsg)
+}
+
+func (gSSH *grapeSSH) setKey(keyPath keyPath) sshError {
 	privateBytes, err := ioutil.ReadFile(string(keyPath))
 	if err != nil {
-		panic(fmt.Sprintf("Could not open idendity file."))
+		return gSSH.newError("Could not open idendity file.")
 	}
 	privateKey, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
-		panic(fmt.Sprintf("Could not parse idendity file."))
+		return gSSH.newError(fmt.Sprintf("Could not parse idendity file."))
 	}
 	gSSH.keySigner = privateKey
+	return nil
 }
 
-func (gSSH *grapeSSH) newClient(server server) grapeSSHClient {
+func (gSSH *grapeSSH) newClient(server server) (*grapeSSHClient, sshError) {
 	client, err := ssh.Dial("tcp", server.Host, &ssh.ClientConfig{
 		User: server.User,
 		Auth: []ssh.AuthMethod{
@@ -47,38 +52,35 @@ func (gSSH *grapeSSH) newClient(server server) grapeSSHClient {
 		},
 	})
 	if err != nil {
-		panic(fmt.Sprintf("Could not establish ssh connection to %s [%s].", server.Name, server.Host))
+		return nil, gSSH.newError("Could not established ssh connection")
 	}
-	return grapeSSHClient{client}
+	return &grapeSSHClient{client}, nil
 }
 
-func (client *grapeSSHClient) newSession() *grapeSSHSession {
+func (client *grapeSSHClient) execCommand(cmd command) *sshOutput {
+	output := &sshOutput{
+		Command: cmd,
+	}
 	session, err := client.NewSession()
 	if err != nil {
-		panic(fmt.Sprintf("Could not establish session [%s].", client.Client.RemoteAddr()))
+		output.Std.Err = "could not establish ssh session"
+	} else {
+		var stderr, stdout bytes.Buffer
+		session.Stdout, session.Stderr = &stdout, &stderr
+		session.Run(string(cmd))
+		session.Close()
+		output.Std = std{
+			Out: stdout.String(),
+			Err: stderr.String(),
+		}
 	}
-	return &grapeSSHSession{session}
+	return output
 }
 
-func (client *grapeSSHClient) exec(command command) *grapeCommandStd {
-
-	session := client.newSession()
-
-	var stderr bytes.Buffer
-	var stdout bytes.Buffer
-
-	session.Stdout = &stdout
-	session.Stderr = &stderr
-
-	session.Run(string(command))
-	session.Close()
-
-	return &grapeCommandStd{
-		Command: command,
-		Std: std{
-			Err: stderr.String(),
-			Out: stdout.String(),
-		},
+func (client *grapeSSHClient) execCommands(commands commands) sshOutputArray {
+	output := sshOutputArray{}
+	for _, command := range commands {
+		output = append(output, client.execCommand(command))
 	}
-
+	return output
 }

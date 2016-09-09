@@ -21,152 +21,65 @@ var demoInputNotOk = input{
 	verifyFlag:  verifyFlag(true),
 }
 
-func TestParse(t *testing.T) {
-	in := input{}
-	in.parse()
+func TestGetInputData(t *testing.T) {
+	getInputData()
 }
 
 func TestValidateInput(t *testing.T) {
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.validate()
-	}()
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputNotOk.validate()
+	dOk := demoInputOk
+	dNotOk := demoInputNotOk
+	if dOk.validate() != nil {
 		t.FailNow()
-	}()
-
+	}
+	if dNotOk.validate() == nil {
+		t.FailNow()
+	}
+	dNotOk.configPath = demoInputOk.configPath
+	if dNotOk.validate() == nil {
+		t.FailNow()
+	}
+	dNotOk.keyPath = demoInputOk.keyPath
+	if dNotOk.validate() == nil {
+		t.FailNow()
+	}
+	dNotOk.serverGroup = demoInputOk.serverGroup
+	if dNotOk.validate() == nil {
+		t.FailNow()
+	}
 }
 
 func TestValidateConfigPath(t *testing.T) {
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.configPath.validate()
-	}()
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputNotOk.configPath.validate()
-		t.FailNow()
-	}()
+	if err := demoInputOk.configPath.validate(&demoInputOk); err != nil {
+		t.Fatalf("1")
+	}
+	if err := demoInputNotOk.configPath.validate(&demoInputNotOk); err == nil {
+		t.Fatalf("2")
+	}
 }
 
 func TestValidateKeyPath(t *testing.T) {
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.keyPath.validate()
-	}()
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputNotOk.keyPath.validate()
+	if err := demoInputOk.keyPath.validate(&demoInputOk); err != nil {
 		t.FailNow()
-	}()
+	}
+	if err := demoInputNotOk.keyPath.validate(&demoInputNotOk); err == nil {
+		t.FailNow()
+	}
 }
 
 func TestValidateServerGroup(t *testing.T) {
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.serverGroup.validate()
-	}()
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputNotOk.serverGroup.validate()
+	if err := demoInputOk.serverGroup.validate(&demoInputOk); err != nil {
 		t.FailNow()
-	}()
+	}
+	if err := demoInputNotOk.serverGroup.validate(&demoInputNotOk); err == nil {
+		t.FailNow()
+	}
 }
 
 func TestValidateCommandName(t *testing.T) {
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.commandName.validate()
-	}()
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputNotOk.commandName.validate()
+	if err := demoInputOk.commandName.validate(&demoInputOk); err != nil {
 		t.FailNow()
-	}()
-}
-
-func TestVerifyAction(t *testing.T) {
-
-	s := servers{
-		server{
-			Name: "testN",
-			Host: "testH",
-			User: "testU",
-		},
 	}
-
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputOk.verifyAction(s)
+	if err := demoInputNotOk.commandName.validate(&demoInputNotOk); err == nil {
 		t.FailNow()
-	}()
-
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.verifyFlag = true
-		demoInputOk.verifyAction(s)
-	}()
-
+	}
 }
