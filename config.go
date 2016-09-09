@@ -12,9 +12,11 @@ type (
 	commands []command
 	command  string
 	server   struct {
-		Name string `yaml:"name"`
-		Host string `yaml:"host"`
-		User string `yaml:"user"`
+		Name   string         `yaml:"name"`
+		Host   string         `yaml:"host"`
+		User   string         `yaml:"user"`
+		Fatal  string         `yaml:"fatal"`
+		Output sshOutputArray `yaml:"output"`
 	}
 	config struct {
 		Version  string              `yaml:"version"`

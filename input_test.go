@@ -21,9 +21,8 @@ var demoInputNotOk = input{
 	verifyFlag:  verifyFlag(true),
 }
 
-func TestParse(t *testing.T) {
-	in := input{}
-	in.parse()
+func TestGetInputData(t *testing.T) {
+	getInputData()
 }
 
 func TestValidateInput(t *testing.T) {
@@ -83,38 +82,4 @@ func TestValidateCommandName(t *testing.T) {
 	if err := demoInputNotOk.commandName.validate(&demoInputNotOk); err == nil {
 		t.FailNow()
 	}
-}
-
-func TestVerifyAction(t *testing.T) {
-
-	s := servers{
-		server{
-			Name: "testN",
-			Host: "testH",
-			User: "testU",
-		},
-	}
-
-	//should panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				recover()
-			}
-		}()
-		demoInputOk.verifyAction(s)
-		t.FailNow()
-	}()
-
-	//should not panic
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				t.FailNow()
-			}
-		}()
-		demoInputOk.verifyFlag = true
-		demoInputOk.verifyAction(s)
-	}()
-
 }

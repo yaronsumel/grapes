@@ -3,60 +3,59 @@ package main
 import (
 	"fmt"
 	"gopkg.in/yaml.v2"
-	"os"
 	"sync"
 )
 
 type (
 	grape struct {
-		input  input
-		ssh    grapeSSH
-		config config
-	}
-	serverOutput struct {
-		Server server             `yaml:"server"`
-		Output []*grapeCommandStd `yaml:"stds"`
-	}
-	serverFatal struct {
-		Server server `yaml:"server"`
-		Fatal  string `yaml:"fatal"`
+		input    input
+		ssh      grapeSSH
+		config   config
+		servers  servers
+		commands commands
 	}
 )
 
 var wg sync.WaitGroup
 
-func (app *grape) init() {
-	app.input.parse()
-	if err := app.input.validate(); err != nil {
+func newGrape(input *input) *grape {
+	app := grape{}
+	var err error
+
+	//parse flags as input
+	//app.input.parse()
+
+	app.input = *input
+
+	//validate input
+	if err = app.input.validate(); err != nil {
 		panic(err)
 	}
-	if err := app.config.set(app.input.configPath); err != nil {
+	//set config into place
+	if err = app.config.set(app.input.configPath); err != nil {
 		panic(err)
 	}
-	if err := app.ssh.setKey(app.input.keyPath); err != nil {
+	// data !
+	if app.servers, err = app.config.getServersFromConfig(app.input.serverGroup); err != nil {
 		panic(err)
 	}
+	if app.commands, err = app.config.getCommandsFromConfig(app.input.commandName); err != nil {
+		panic(err)
+	}
+	//load private key
+	if err = app.ssh.setKey(app.input.keyPath); err != nil {
+		panic(err)
+	}
+	return &app
 }
 
 func (app *grape) run() {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Printf("\r\nFatal: %s \n\n", err)
-			os.Exit(1)
-		}
-	}()
-	app.init()
-	servers, err := app.config.getServersFromConfig(app.input.serverGroup)
-	if err != nil {
-		panic(err)
-	}
-	app.input.verifyAction(servers)
-	for _, server := range servers {
+	for _, server := range app.servers {
 		if app.input.asyncFlag {
 			wg.Add(1)
-			go app.runCommandAsync(server, &wg)
+			go app.runOnServer(server, &wg)
 		} else {
-			app.runCommand(server)
+			app.runOnServer(server, nil)
 		}
 	}
 	if app.input.asyncFlag {
@@ -64,64 +63,42 @@ func (app *grape) run() {
 	}
 }
 
-func (app *grape) runCommandAsync(server server, wg *sync.WaitGroup) {
-	a, err := app.runCommandsOnServer(server)
-	wg.Done()
-	if err != nil {
-		app.print(serverFatal{
-			Server: server,
-			Fatal:  err.Error(),
-		})
-		return
-	}
-	app.print(a)
-}
-
-func (app *grape) runCommand(server server) {
-	a, err := app.runCommandsOnServer(server)
-	if err != nil {
-		app.print(serverFatal{
-			Server: server,
-			Fatal:  err.Error(),
-		})
-		return
-	}
-	app.print(a)
-}
-
-func (app *grape) runCommandsOnServer(server server) (*serverOutput, error) {
-	commands, err := app.config.getCommandsFromConfig(app.input.commandName)
-	if err != nil {
-		return nil, err
-	}
+func (app *grape) runOnServer(server server, wg *sync.WaitGroup) {
 	client, err := app.ssh.newClient(server)
 	if err != nil {
-		return nil, err
+		server.Fatal = err.Error()
+	} else {
+		server.Output = client.execCommands(app.commands)
 	}
-	so := serverOutput{
-		Server: server,
+	if wg != nil {
+		wg.Done()
 	}
-	for _, command := range commands {
-		grapeCommandStdOut, err := client.exec(command)
-		if err != nil {
-		}
-		so.Output = append(so.Output, grapeCommandStdOut)
-	}
-	return &so, nil
+	server.printOutput()
 }
 
-func (app grape) print(a interface{}) {
-	out, err := yaml.Marshal(a)
-	if err != nil {
-		panic("something went wrong with the output")
-	}
+func (s *server) printOutput() {
+	out, _ := yaml.Marshal(s)
 	fmt.Println(string(out))
 }
 
-func (so *serverOutput) print() {
-	out, err := yaml.Marshal(so)
-	if err != nil {
-		panic("something went wrong with the output")
+func (app *grape) verifyAction() {
+	var char = "n"
+	fmt.Println("The following command will run on the following servers:")
+	fmt.Printf("command `%s` will run over `%s`.\n", app.input.commandName, app.input.serverGroup)
+	fmt.Println("commands:")
+	for k, v := range app.commands {
+		fmt.Printf("\t#%d - `%s` \n", k, v)
 	}
-	fmt.Println(string(out))
+	fmt.Println("servers:")
+	for k, v := range app.servers {
+		fmt.Printf("\t#%d - %s [%s@%s] \n", k, v.Name, v.User, v.Host)
+	}
+	if app.input.verifyFlag {
+		fmt.Println("-y used.forced to continue.")
+		return
+	}
+	fmt.Print("\n -- are your sure? [y/N] : ")
+	if _, err := fmt.Scanf("%s", &char); err != nil || char != "y" {
+		panic("type y to continue")
+	}
 }

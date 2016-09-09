@@ -34,49 +34,57 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func TestNewSession(t *testing.T) {
+func TestExecCommand(t *testing.T) {
 	gSSH := grapeSSH{}
 	gSSH.setKey("testFiles/id_rsa")
+	var client *grapeSSHClient
+	var err error
+	var output *sshOutput
 	s := server{
 		Host: "sdf.org:22",
 		User: "new",
 		Name: "public",
 	}
-	client, err := gSSH.newClient(s)
+	client, err = gSSH.newClient(s)
 	if err != nil {
 		t.FailNow()
 	}
-	if _, err := client.newSession(); err != nil {
+	output = client.execCommand("echo")
+	if output.Std.Err == "could not establish ssh session" {
 		t.FailNow()
 	}
+	// make that panic
 	client.Close()
-	if _, err := client.newSession(); err == nil {
+	output = client.execCommand("echo")
+	if output.Std.Err != "could not establish ssh session" {
 		t.FailNow()
 	}
 }
 
-func TestExec(t *testing.T) {
+func TestExecCommands(t *testing.T) {
+
+	demoCommands := commands{
+		command("ls -al"),
+		command("ls -al"),
+	}
 	gSSH := grapeSSH{}
 	gSSH.setKey("testFiles/id_rsa")
+	var client *grapeSSHClient
+	var err error
 	s := server{
 		Host: "sdf.org:22",
 		User: "new",
 		Name: "public",
 	}
-	client, err := gSSH.newClient(s)
+	client, err = gSSH.newClient(s)
+	defer client.Close()
 	if err != nil {
 		t.FailNow()
 	}
-	std, err := client.exec(command("echo"))
-	if err != nil {
-		t.FailNow()
-	}
-	client.Close()
-	_, err2 := client.exec(command("echo"))
-	if err2 == nil {
-		t.FailNow()
-	}
-	if std.Std.Err == "" && std.Std.Out == "" {
-		t.FailNow()
+	output := client.execCommands(demoCommands)
+	for _, v := range output {
+		if v.Std.Err == "could not establish ssh session" {
+			t.FailNow()
+		}
 	}
 }

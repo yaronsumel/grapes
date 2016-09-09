@@ -15,25 +15,19 @@ type (
 	grapeSSHClient struct {
 		*ssh.Client
 	}
-	grapeSSHSession struct {
-		*ssh.Session
-	}
 	std struct {
 		Out string
 		Err string
 	}
-	grapeCommandStd struct {
+	sshOutput struct {
 		Command command
 		Std     std
 	}
-	sshError error
+	sshOutputArray []*sshOutput
+	sshError       error
 )
 
 func (gSSH *grapeSSH) newError(errMsg string) sshError {
-	return errors.New(errMsg)
-}
-
-func (client *grapeSSHClient) newError(errMsg string) sshError {
 	return errors.New(errMsg)
 }
 
@@ -58,49 +52,35 @@ func (gSSH *grapeSSH) newClient(server server) (*grapeSSHClient, sshError) {
 		},
 	})
 	if err != nil {
-		return nil, gSSH.newError(fmt.Sprintf("Could not established ssh connection to server [%s].", server.Host))
+		return nil, gSSH.newError("Could not established ssh connection")
 	}
 	return &grapeSSHClient{client}, nil
 }
 
-func (client *grapeSSHClient) newSession() (*grapeSSHSession, sshError) {
+func (client *grapeSSHClient) execCommand(cmd command) *sshOutput {
+	output := &sshOutput{
+		Command: cmd,
+	}
 	session, err := client.NewSession()
 	if err != nil {
-		return nil, client.newError(fmt.Sprintf("Could not establish session [%s].", client.Client.RemoteAddr()))
+		output.Std.Err = "could not establish ssh session"
+	} else {
+		var stderr, stdout bytes.Buffer
+		session.Stdout, session.Stderr = &stdout, &stderr
+		session.Run(string(cmd))
+		session.Close()
+		output.Std = std{
+			Out: stdout.String(),
+			Err: stderr.String(),
+		}
 	}
-	return &grapeSSHSession{session}, nil
+	return output
 }
 
-func (client *grapeSSHClient) exec(command command) (*grapeCommandStd, sshError) {
-
-	commandStd := &grapeCommandStd{
-		Command: command,
-		Std: std{
-			Err: "",
-			Out: "",
-		},
+func (client *grapeSSHClient) execCommands(commands commands) sshOutputArray {
+	output := sshOutputArray{}
+	for _, command := range commands {
+		output = append(output, client.execCommand(command))
 	}
-
-	session, err := client.newSession()
-
-	if err != nil {
-		return nil, err
-	}
-
-	var stderr bytes.Buffer
-	var stdout bytes.Buffer
-
-	session.Stdout = &stdout
-	session.Stderr = &stderr
-
-	session.Run(string(command))
-	session.Close()
-
-	commandStd.Std = std{
-		Err: stderr.String(),
-		Out: stdout.String(),
-	}
-
-	return commandStd, nil
-
+	return output
 }

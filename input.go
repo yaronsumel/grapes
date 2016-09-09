@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 )
 
 type (
@@ -25,7 +24,7 @@ type (
 	inputError error
 )
 
-func (input *input) parse() {
+func getInputData() *input {
 
 	verifyActionFlagPtr := flag.Bool("y", false, "force yes")
 	asyncFlagPtr := flag.Bool("async", false, "async - when true, parallel executing over servers")
@@ -36,13 +35,14 @@ func (input *input) parse() {
 
 	flag.Parse()
 
-	input.verifyFlag = verifyFlag(*verifyActionFlagPtr)
-	input.asyncFlag = asyncFlag(*asyncFlagPtr)
-	input.commandName = commandName(*commandPtr)
-	input.serverGroup = serverGroup(*serverGroupPtr)
-	input.keyPath = keyPath(*keyPathPtr)
-	input.configPath = configPath(*configPathPtr)
-
+	return &input{
+		verifyFlag:  verifyFlag(*verifyActionFlagPtr),
+		asyncFlag:   asyncFlag(*asyncFlagPtr),
+		commandName: commandName(*commandPtr),
+		serverGroup: serverGroup(*serverGroupPtr),
+		keyPath:     keyPath(*keyPathPtr),
+		configPath:  configPath(*configPathPtr),
+	}
 }
 
 func (input *input) newError(errMsg string) inputError {
@@ -91,24 +91,4 @@ func (val *commandName) validate(input *input) inputError {
 		return input.newError("command name is empty please set grapes -cmd whats_up")
 	}
 	return nil
-}
-
-func (input *input) verifyAction(servers servers) {
-
-	var char = "n"
-	fmt.Printf("command [%s] will run on the following servers:\n", input.commandName)
-
-	for k, v := range servers {
-		fmt.Printf("\t#%d - %s [%s@%s] \n", k, v.Name, v.User, v.Host)
-	}
-
-	if input.verifyFlag {
-		fmt.Println("-y used.forced to continue.")
-		return
-	}
-
-	fmt.Print("\n -- are your sure? [y/N] : ")
-	if _, err := fmt.Scanf("%s", &char); err != nil || char != "y" {
-		panic("type y to continue")
-	}
 }
