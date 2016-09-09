@@ -5,8 +5,6 @@ import (
 	"os"
 )
 
-//go test -coverprofile cover.out && go tool cover -html=cover.out -o cover.html
-
 const (
 	version = "0.2.2"
 	welcome = `

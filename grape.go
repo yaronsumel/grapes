@@ -22,9 +22,6 @@ func newGrape(input *input) *grape {
 	app := grape{}
 	var err error
 
-	//parse flags as input
-	//app.input.parse()
-
 	app.input = *input
 
 	//validate input
