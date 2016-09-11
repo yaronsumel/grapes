@@ -8,10 +8,10 @@ grapes is lightweight tool designed to distribute commands over ssh with ease.
 
     $ go get -u github.com/yaronsumel/grapes
 
-  ... or Grab Portable Binary (md5sum):
-* [linux](https://github.com/yaronsumel/grapes/releases/download/v0.2/linux-grapes.7z) (60734d1004c9266f2cc4987453262931)
-* [windows](https://github.com/yaronsumel/grapes/releases/download/v0.2/win-grapes.zip) (b18c8e4f511329e5d4b9a27bd8aa52c7)
-* [darwin](https://github.com/yaronsumel/grapes/releases/download/v0.2/darwin-grapes.zip) (d89264f774f50a39379ec46c1865e286)
+  ... or Grab Portable Binary - v.0.2.2 (md5sum):
+* [linux](https://github.com/yaronsumel/grapes/releases/download/v0.2.2/grapes.7z) (d71a04fc489b5696a06c045ed892d103)
+* [windows](https://github.com/yaronsumel/grapes/releases/download/v0.2.2/win-grapes.zip) (f9f7b8de79df69a13c2a6e7a0d06ab6c)
+* [darwin](https://github.com/yaronsumel/grapes/releases/download/v0.2.2/darwin.zip) (b98791fdb97e04332960ca10e92c8766)
 
 ### Usage ###
 
