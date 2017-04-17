@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
+	"net"
 )
 
 type (
@@ -38,7 +39,7 @@ func (gSSH *grapeSSH) setKey(keyPath keyPath) sshError {
 	}
 	privateKey, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
-		return gSSH.newError(fmt.Sprintf("Could not parse idendity file."))
+		return gSSH.newError(fmt.Sprint("Could not parse idendity file."))
 	}
 	gSSH.keySigner = privateKey
 	return nil
@@ -49,6 +50,12 @@ func (gSSH *grapeSSH) newClient(server server) (*grapeSSHClient, sshError) {
 		User: server.User,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(gSSH.keySigner),
+		},
+		// CVE-2017-3204
+		// "fix" for now : InsecureIgnoreHostKey
+		// gonna validate host key in the next version of grapes
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
 		},
 	})
 	if err != nil {
