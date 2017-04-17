@@ -1,5 +1,7 @@
 # grapes [![Go Report Card](https://goreportcard.com/badge/github.com/yaronsumel/grapes)](https://goreportcard.com/report/github.com/yaronsumel/grapes) [![Build Status](https://travis-ci.org/yaronsumel/grapes.svg?branch=master)](https://travis-ci.org/yaronsumel/grapes) [![Build status](https://ci.appveyor.com/api/projects/status/fnepp81rdi8prawn/branch/master?svg=true)](https://ci.appveyor.com/project/yaronsumel/grapes/branch/master) [![GoDoc](https://godoc.org/github.com/yaronsumel/grapes?status.svg)](https://godoc.org/github.com/yaronsumel/grapes)
 
+> ## Warning : grapes currently DOES NOT validate the host key during the handshake ( CVE-2017-3204 ). Next version of grapes will support full host key validation.
+
 grapes is lightweight tool designed to distribute commands over ssh with ease.
 
 ### Installation ###
