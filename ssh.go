@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"net"
+
+	"golang.org/x/crypto/ssh"
 )
 
 type (
@@ -39,7 +40,7 @@ func (gSSH *grapeSSH) setKey(keyPath keyPath) sshError {
 	}
 	privateKey, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
-		return gSSH.newError(fmt.Sprint("Could not parse idendity file."))
+		return gSSH.newError(fmt.Sprint("Could not parse identity file."))
 	}
 	gSSH.keySigner = privateKey
 	return nil
@@ -59,7 +60,7 @@ func (gSSH *grapeSSH) newClient(server server) (*grapeSSHClient, sshError) {
 		},
 	})
 	if err != nil {
-		return nil, gSSH.newError("Could not established ssh connection")
+		return nil, gSSH.newError("Could not establish ssh connection")
 	}
 	return &grapeSSHClient{client}, nil
 }
@@ -70,7 +71,7 @@ func (client *grapeSSHClient) execCommand(cmd command) *sshOutput {
 	}
 	session, err := client.NewSession()
 	if err != nil {
-		output.Std.Err = "could not establish ssh session"
+		output.Std.Err = "Could not establish ssh session"
 	} else {
 		var stderr, stdout bytes.Buffer
 		session.Stdout, session.Stderr = &stdout, &stderr
