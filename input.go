@@ -27,7 +27,7 @@ type (
 func getInputData() *input {
 
 	verifyActionFlagPtr := flag.Bool("y", false, "force yes")
-	asyncFlagPtr := flag.Bool("async", false, "async - when true, parallel executing over servers")
+	asyncFlagPtr := flag.Bool("async", false, "async - if true, parallel executing over servers")
 	configPathPtr := flag.String("c", "", "config file - yaml config file")
 	keyPathPtr := flag.String("i", "", "identity file - path to private key")
 	serverGroupPtr := flag.String("s", "", "server group - name of the server group")
@@ -74,7 +74,7 @@ func (val *configPath) validate(input *input) inputError {
 
 func (val *keyPath) validate(input *input) inputError {
 	if *val == "" {
-		return input.newError("idendity file path is empty please set grapes -i ~/.ssh/id_rsaa")
+		return input.newError("identity file path is empty please set grapes -i ~/.ssh/id_rsa")
 	}
 	return nil
 }

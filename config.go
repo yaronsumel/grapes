@@ -3,8 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 type (
@@ -36,7 +37,7 @@ func (conf *config) set(configPath configPath) error {
 		return conf.newError(fmt.Sprintf("Could not open %s  ", configPath))
 	}
 	if err := yaml.Unmarshal([]byte(data), &conf); err != nil {
-		return conf.newError(fmt.Sprintf("Could not parse config file. make sure its yaml."))
+		return conf.newError(fmt.Sprintf("Could not parse config file. Make sure its yaml."))
 	}
 	return nil
 }
