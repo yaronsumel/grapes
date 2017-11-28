@@ -30,10 +30,12 @@ func getInputData() *input {
 
 	verifyActionFlagPtr := flag.Bool("y", false, "force yes")
 	asyncFlagPtr := flag.Bool("async", false, "async - if true, parallel executing over servers")
-	configPathPtr := flag.String("c", "", "config file - yaml config file")
-	keyPathPtr := flag.String("i", "", "identity file - path to private key")
+	configPathPtr := flag.String("c", "", "config file - yaml config file, defaulting to ~/.grapes.yml")
+	keyPathPtr := flag.String("i", "", "identity file - path to private key, defaulting to ~/.ssh/id_rsa")
 	serverGroupPtr := flag.String("s", "", "server group - name of the server group")
 	commandPtr := flag.String("cmd", "", "command name - name of the command to run")
+
+	flag.Parse()
 
 	if *configPathPtr == "" {
 		potentialConfig, err := homedir.Expand("~/.grapes.yml")
@@ -48,8 +50,6 @@ func getInputData() *input {
 			keyPathPtr = &potentialKeyPath
 		}
 	}
-
-	flag.Parse()
 
 	return &input{
 		verifyFlag:  verifyFlag(*verifyActionFlagPtr),
