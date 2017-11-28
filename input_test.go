@@ -25,6 +25,20 @@ func TestGetInputData(t *testing.T) {
 	getInputData()
 }
 
+func TestDefaultKeyPath(t *testing.T) {
+	inp := getInputData()
+	if err := inp.keyPath.validate(&demoInputOk); err != nil {
+		t.Fail()
+	}
+}
+
+func TestDefaultConfigPath(t *testing.T) {
+	inp := getInputData()
+	if err := inp.configPath.validate(&demoInputOk); err != nil {
+		t.Fail()
+	}
+}
+
 func TestValidateInput(t *testing.T) {
 	dOk := demoInputOk
 	dNotOk := demoInputNotOk
