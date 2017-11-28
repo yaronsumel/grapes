@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"flag"
+
+	"github.com/mitchellh/go-homedir"
 )
 
 type (
@@ -32,6 +34,20 @@ func getInputData() *input {
 	keyPathPtr := flag.String("i", "", "identity file - path to private key")
 	serverGroupPtr := flag.String("s", "", "server group - name of the server group")
 	commandPtr := flag.String("cmd", "", "command name - name of the command to run")
+
+	if *configPathPtr == "" {
+		potentialConfig, err := homedir.Expand("~/.grapes.yml")
+		if err == nil {
+			configPathPtr = &potentialConfig
+		}
+	}
+
+	if *keyPathPtr == "" {
+		potentialKeyPath, err := homedir.Expand("~/.ssh/id_rsa")
+		if err == nil {
+			keyPathPtr = &potentialKeyPath
+		}
+	}
 
 	flag.Parse()
 
