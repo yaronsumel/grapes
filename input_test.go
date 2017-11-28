@@ -4,25 +4,49 @@ import (
 	"testing"
 )
 
-var demoInputOk = input{
-	asyncFlag:   asyncFlag(false),
-	configPath:  configPath("/demo"),
-	keyPath:     keyPath("/demo"),
-	serverGroup: serverGroup("demoServerGroup"),
-	commandName: commandName("demo"),
-	verifyFlag:  verifyFlag(false),
-}
+var (
+	inputCallResult *input
 
-var demoInputNotOk = input{
-	asyncFlag:   asyncFlag(false),
-	configPath:  configPath(""),
-	keyPath:     keyPath(""),
-	serverGroup: serverGroup(""),
-	verifyFlag:  verifyFlag(true),
+	demoInputOk = input{
+		asyncFlag:   asyncFlag(false),
+		configPath:  configPath("/demo"),
+		keyPath:     keyPath("/demo"),
+		serverGroup: serverGroup("demoServerGroup"),
+		commandName: commandName("demo"),
+		verifyFlag:  verifyFlag(false),
+	}
+
+	demoInputNotOk = input{
+		asyncFlag:   asyncFlag(false),
+		configPath:  configPath(""),
+		keyPath:     keyPath(""),
+		serverGroup: serverGroup(""),
+		verifyFlag:  verifyFlag(true),
+	}
+)
+
+func setInputData() {
+	if nil == inputCallResult {
+		inputCallResult = getInputData()
+	}
 }
 
 func TestGetInputData(t *testing.T) {
-	getInputData()
+	setInputData()
+}
+
+func TestDefaultKeyPath(t *testing.T) {
+	setInputData()
+	if err := inputCallResult.keyPath.validate(&demoInputOk); err != nil {
+		t.Fail()
+	}
+}
+
+func TestDefaultConfigPath(t *testing.T) {
+	setInputData()
+	if err := inputCallResult.configPath.validate(&demoInputOk); err != nil {
+		t.Fail()
+	}
 }
 
 func TestValidateInput(t *testing.T) {
