@@ -1,4 +1,4 @@
-package main // import "github.com/yaronsumel/graps"
+package main // import "github.com/yaronsumel/grapes"
 
 import (
 	"fmt"
