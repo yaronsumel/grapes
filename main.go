@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	version = "0.2.2"
+	version = "0.3.0"
 	welcome = `
 //      ____ __________ _____  ___  _____
 //     / __  / ___/ __  / __ \/ _ \/ ___/
@@ -33,5 +33,5 @@ func main() {
 
 	app.verifyAction()
 
-	app.run()
+	app.run("~/.ssh/known_hosts")
 }

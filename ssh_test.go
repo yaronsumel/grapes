@@ -2,6 +2,8 @@ package main
 
 import (
 	"testing"
+
+	"golang.org/x/crypto/ssh/knownhosts"
 )
 
 func TestSetKey(t *testing.T) {
@@ -25,11 +27,17 @@ func TestNewClient(t *testing.T) {
 		User: "new",
 		Name: "public",
 	}
-	if _, err := gSSH.newClient(s); err != nil {
+
+	hostKeyCallback, err := knownhosts.New("testFiles/known_hosts")
+	if err != nil {
+		t.FailNow()
+	}
+
+	if _, err := gSSH.newClient(s, hostKeyCallback); err != nil {
 		t.FailNow()
 	}
 	s.Host = "localhost"
-	if _, err := gSSH.newClient(s); err == nil {
+	if _, err := gSSH.newClient(s, hostKeyCallback); err == nil {
 		t.FailNow()
 	}
 }
@@ -45,17 +53,23 @@ func TestExecCommand(t *testing.T) {
 		User: "new",
 		Name: "public",
 	}
-	client, err = gSSH.newClient(s)
+	hostKeyCallback, err := knownhosts.New("testFiles/known_hosts")
 	if err != nil {
-		t.FailNow()
+		t.Fatal(err)
 	}
-	output = client.execCommand("echo")
+
+	client, err = gSSH.newClient(s, hostKeyCallback)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output = client.execCommand("ls -al")
 	if output.Std.Err == "could not establish ssh session" {
 		t.FailNow()
 	}
 	// make that panic
 	client.Close()
-	output = client.execCommand("echo")
+	output = client.execCommand("ls -al")
 	if output.Std.Err != "could not establish ssh session" {
 		t.FailNow()
 	}
@@ -76,11 +90,17 @@ func TestExecCommands(t *testing.T) {
 		User: "new",
 		Name: "public",
 	}
-	client, err = gSSH.newClient(s)
-	defer client.Close()
+
+	hostKeyCallback, err := knownhosts.New("testFiles/known_hosts")
 	if err != nil {
 		t.FailNow()
 	}
+
+	client, err = gSSH.newClient(s, hostKeyCallback)
+	if err != nil {
+		t.FailNow()
+	}
+	defer client.Close()
 	output := client.execCommands(demoCommands)
 	for _, v := range output {
 		if v.Std.Err == "could not establish ssh session" {
