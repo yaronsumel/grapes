@@ -1,4 +1,4 @@
-module github.com/yaronsumel/graps
+module github.com/yaronsumel/grapes
 
 require (
 	github.com/mitchellh/go-homedir v1.1.0
