@@ -110,9 +110,9 @@ func TestRun(t *testing.T) {
 		},
 	}
 	app.input.asyncFlag = true
-	app.run()
+	app.run("testFiles/known_hosts")
 	app.input.asyncFlag = false
-	app.run()
+	app.run("testFiles/known_hosts")
 }
 
 func TestPrintOutput(t *testing.T) {

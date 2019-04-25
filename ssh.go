@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"net"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -36,7 +35,7 @@ func (gSSH *grapeSSH) newError(errMsg string) sshError {
 func (gSSH *grapeSSH) setKey(keyPath keyPath) sshError {
 	privateBytes, err := ioutil.ReadFile(string(keyPath))
 	if err != nil {
-		return gSSH.newError("Could not open idendity file.")
+		return gSSH.newError("Could not open identity file.")
 	}
 	privateKey, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
@@ -46,21 +45,16 @@ func (gSSH *grapeSSH) setKey(keyPath keyPath) sshError {
 	return nil
 }
 
-func (gSSH *grapeSSH) newClient(server server) (*grapeSSHClient, sshError) {
+func (gSSH *grapeSSH) newClient(server server, hostKeyCallback ssh.HostKeyCallback) (*grapeSSHClient, sshError) {
 	client, err := ssh.Dial("tcp", server.Host, &ssh.ClientConfig{
 		User: server.User,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(gSSH.keySigner),
 		},
-		// CVE-2017-3204
-		// "fix" for now : InsecureIgnoreHostKey
-		// gonna validate host key in the next version of grapes
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
-		},
+		HostKeyCallback: hostKeyCallback,
 	})
 	if err != nil {
-		return nil, gSSH.newError("Could not establish ssh connection")
+		return nil, gSSH.newError(err.Error() + " - could not establish ssh connection")
 	}
 	return &grapeSSHClient{client}, nil
 }
@@ -71,7 +65,7 @@ func (client *grapeSSHClient) execCommand(cmd command) *sshOutput {
 	}
 	session, err := client.NewSession()
 	if err != nil {
-		output.Std.Err = "Could not establish ssh session"
+		output.Std.Err = "could not establish ssh session"
 	} else {
 		var stderr, stdout bytes.Buffer
 		session.Stdout, session.Stderr = &stdout, &stderr

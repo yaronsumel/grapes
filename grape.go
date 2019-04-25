@@ -2,8 +2,13 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"log"
 	"sync"
+
+	"github.com/mitchellh/go-homedir"
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/knownhosts"
+	"gopkg.in/yaml.v2"
 )
 
 type (
@@ -46,13 +51,24 @@ func newGrape(input *input) *grape {
 	return &app
 }
 
-func (app *grape) run() {
+func (app *grape) run(knownHostsPath string) {
+
+	knownHostsPath, err := homedir.Expand(knownHostsPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	hostKeyCallback, err := knownhosts.New(knownHostsPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, server := range app.servers {
 		if app.input.asyncFlag {
 			wg.Add(1)
-			go app.runOnServer(server, &wg)
+			go app.runOnServer(server, hostKeyCallback, &wg)
 		} else {
-			app.runOnServer(server, nil)
+			app.runOnServer(server, hostKeyCallback, nil)
 		}
 	}
 	if app.input.asyncFlag {
@@ -60,8 +76,9 @@ func (app *grape) run() {
 	}
 }
 
-func (app *grape) runOnServer(server server, wg *sync.WaitGroup) {
-	client, err := app.ssh.newClient(server)
+func (app *grape) runOnServer(server server, hostKeyCallback ssh.HostKeyCallback, wg *sync.WaitGroup) {
+
+	client, err := app.ssh.newClient(server, hostKeyCallback)
 	if err != nil {
 		server.Fatal = err.Error()
 	} else {
