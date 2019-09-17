@@ -10,6 +10,12 @@ In order to add your ssh server fingerprint to `known_hosts` run the following:
 
     $ ssh-keyscan -H YOURHOST.COM >> ~/.ssh/known_hosts
 
+### Run with docker 
+
+```bash
+docker run -v ~/.grapes.yml:/root/.grapes.yml -v ~/.ssh/id_rsa:/root/.ssh/id_rsa -it docker.pkg.github.com/yaronsumel/grapes/grapes:0.3.0
+```
+
 ### Installation ###
 
   Run (golang v1.10+ required):
