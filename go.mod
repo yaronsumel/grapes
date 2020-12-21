@@ -1,7 +1,9 @@
 module github.com/yaronsumel/grapes
 
+go 1.15
+
 require (
 	github.com/mitchellh/go-homedir v1.1.0
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-	gopkg.in/yaml.v2 v2.2.2
+	golang.org/x/crypto v0.0.0-20201217014255-9d1352758620
+	gopkg.in/yaml.v2 v2.4.0
 )
