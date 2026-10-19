@@ -128,6 +128,12 @@ func serveTestSession(transport *ssh.ServerConn, channel ssh.Channel, requests <
 			io.WriteString(channel, "partial output\n")
 			io.WriteString(channel.Stderr(), "failed\n")
 			status = 42
+		case "stall":
+			io.WriteString(channel, "started\n")
+			transport.Wait()
+			return
+		case "exit-one":
+			status = 1
 		case "silent-failure":
 			status = 42
 		case "disconnect":

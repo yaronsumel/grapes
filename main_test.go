@@ -40,6 +40,7 @@ func TestCLIProcess(t *testing.T) {
 			{"rejected session", "success", false, false, true, 1},
 			{"connection failure", "success", true, false, false, 1},
 			{"authentication failure", "success", false, true, false, 1},
+			{"command timeout", "stall", false, false, false, 1},
 		} {
 			t.Run(fmt.Sprintf("%s/async=%v", tc.name, async), func(t *testing.T) {
 				f := newSSHFixture(t, tc.rejectSession)
@@ -60,6 +61,9 @@ func TestCLIProcess(t *testing.T) {
 					t.Fatal(err)
 				}
 				args := []string{"-test.run=^TestCLIProcess$", "--", "-y", "-c", path, "-i", "testFiles/id_rsa", "-s", "test", "-cmd", "test"}
+				if tc.command == "stall" {
+					args = append(args, "-command-timeout", "100ms")
+				}
 				if async {
 					args = append(args, "-async")
 				}
@@ -81,6 +85,9 @@ func TestCLIProcess(t *testing.T) {
 				}
 				if tc.wantCode != 0 && stderr.Len() == 0 {
 					t.Fatal("CLI failure did not include a diagnostic")
+				}
+				if tc.command == "stall" && !strings.Contains(stdout.String(), "timed out after 100ms") {
+					t.Fatalf("configured timeout missing from CLI output: %s", &stdout)
 				}
 				if tc.name == "command failure" && !strings.Contains(stdout.String(), "exit_status: 42") {
 					t.Fatalf("command exit status missing from CLI output: %s", &stdout)

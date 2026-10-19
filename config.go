@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -32,7 +32,7 @@ func (conf *config) newError(errMsg string) configError {
 }
 
 func (conf *config) set(configPath configPath) error {
-	data, err := ioutil.ReadFile(string(configPath))
+	data, err := os.ReadFile(string(configPath))
 	if err != nil {
 		return conf.newError(fmt.Sprintf("Could not open %s  ", configPath))
 	}

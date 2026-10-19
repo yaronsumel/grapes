@@ -32,6 +32,8 @@ func newGrape(input *input) *grape {
 	if err = app.input.validate(); err != nil {
 		panic(err)
 	}
+	app.ssh.connectTimeout = app.input.connectTimeout
+	app.ssh.commandTimeout = app.input.commandTimeout
 	//set config into place
 	if err = app.config.set(app.input.configPath); err != nil {
 		panic(err)

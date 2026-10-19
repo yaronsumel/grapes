@@ -37,8 +37,20 @@ success). Stderr output alone does not mean that a command failed.
 
 Grapes finishes reporting all selected servers before exiting, including in
 async mode. It exits with status 1 if any connection, command, or output write
-fails, and status 0 when all succeed. Commands continue after a failed command;
+fails, and status 0 when all succeed. Commands continue after a nonzero remote exit;
 each result is reported separately. Failure summaries are written to stderr.
+
+Connection setup has a 10-second limit covering DNS lookup, TCP connection, and
+SSH handshake/authentication. Each command has a separate 5-minute limit covering
+session setup, execution, output collection, and session cleanup. Both limits
+apply in sequential and async mode and can be changed using positive durations:
+
+    $ grapes -s prod -cmd whats_up -y --connect-timeout=20s --command-timeout=15m
+
+On a timeout, grapes closes that server's SSH connection, reports the timeout
+with any captured output, and exits with status 1 after reporting all servers.
+Remaining commands on that server are marked as skipped; other servers continue.
+Closing the connection does not guarantee termination of detached remote processes.
 
 ### Config ###
 

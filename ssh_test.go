@@ -43,6 +43,7 @@ func TestExecCommand(t *testing.T) {
 		{"warning", "ok\n", "warning\n", 0, false},
 		{"failure", "partial output\n", "failed\n", 42, true},
 		{"silent-failure", "", "", 42, true},
+		{"exit-one", "", "", 1, true},
 		{"reject", "", "", -1, true},
 		{"disconnect", "", "", -1, true},
 		{"missing-status", "", "", -1, true},
