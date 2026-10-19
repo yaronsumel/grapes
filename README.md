@@ -18,9 +18,9 @@ docker run -v ~/.grapes.yml:/root/.grapes.yml -v ~/.ssh/id_rsa:/root/.ssh/id_rsa
 
 ### Installation ###
 
-  Run (golang v1.10+ required):
+  Run (Go v1.26+ required):
 
-    $ export GO111MODULE=on; go get -u github.com/yaronsumel/grapes
+    $ go install github.com/yaronsumel/grapes@latest
 
 ### Usage ###
 
@@ -29,6 +29,28 @@ docker run -v ~/.grapes.yml:/root/.grapes.yml -v ~/.ssh/id_rsa:/root/.ssh/id_rsa
     $ grapes -c config.yml -i ~/.ssh/id_rsa -s prod -cmd whats_up --async
 
 * use the --help flag for full usage output.
+
+Each command result includes its captured stdout and stderr under `std.out` and
+`std.err`. An `error` field describes execution or session failures, and
+`exit_status` records the remote exit status when available (including zero for
+success). Stderr output alone does not mean that a command failed.
+
+Grapes finishes reporting all selected servers before exiting, including in
+async mode. It exits with status 1 if any connection, command, or output write
+fails, and status 0 when all succeed. Commands continue after a nonzero remote exit;
+each result is reported separately. Failure summaries are written to stderr.
+
+Connection setup has a 10-second limit covering DNS lookup, TCP connection, and
+SSH handshake/authentication. Each command has a separate 5-minute limit covering
+session setup, execution, output collection, and session cleanup. Both limits
+apply in sequential and async mode and can be changed using positive durations:
+
+    $ grapes -s prod -cmd whats_up -y --connect-timeout=20s --command-timeout=15m
+
+On a timeout, grapes closes that server's SSH connection, reports the timeout
+with any captured output, and exits with status 1 after reporting all servers.
+Remaining commands on that server are marked as skipped; other servers continue.
+Closing the connection does not guarantee termination of detached remote processes.
 
 ### Config ###
 
@@ -55,5 +77,11 @@ commands:
   date :
       - "date"
  ```
+
+### Tests ###
+
+    $ go test -race ./...
+
+The SSH tests use a local test server and do not require access to a public server.
  
 > ##### Written and Maintained by [@YaronSumel](https://twitter.com/yaronsumel) #####

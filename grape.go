@@ -1,8 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
+	"io"
 	"sync"
 
 	"github.com/mitchellh/go-homedir"
@@ -21,8 +22,6 @@ type (
 	}
 )
 
-var wg sync.WaitGroup
-
 func newGrape(input *input) *grape {
 	app := grape{}
 	var err error
@@ -33,6 +32,8 @@ func newGrape(input *input) *grape {
 	if err = app.input.validate(); err != nil {
 		panic(err)
 	}
+	app.ssh.connectTimeout = app.input.connectTimeout
+	app.ssh.commandTimeout = app.input.commandTimeout
 	//set config into place
 	if err = app.config.set(app.input.configPath); err != nil {
 		panic(err)
@@ -51,48 +52,70 @@ func newGrape(input *input) *grape {
 	return &app
 }
 
-func (app *grape) run(knownHostsPath string) {
+func (app *grape) run(knownHostsPath string, out io.Writer) error {
 
 	knownHostsPath, err := homedir.Expand(knownHostsPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	hostKeyCallback, err := knownhosts.New(knownHostsPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	for _, server := range app.servers {
+	var wg sync.WaitGroup
+	var outputMu sync.Mutex
+	errs := make([]error, len(app.servers))
+	runServer := func(i int, server server) {
+		result, runErr := app.runOnServer(server, hostKeyCallback)
+		outputMu.Lock()
+		outputErr := result.printOutput(out)
+		outputMu.Unlock()
+		errs[i] = errors.Join(runErr, outputErr)
+	}
+	for i, server := range app.servers {
 		if app.input.asyncFlag {
 			wg.Add(1)
-			go app.runOnServer(server, hostKeyCallback, &wg)
+			go func() {
+				defer wg.Done()
+				runServer(i, server)
+			}()
 		} else {
-			app.runOnServer(server, hostKeyCallback, nil)
+			runServer(i, server)
 		}
 	}
-	if app.input.asyncFlag {
-		wg.Wait()
-	}
+	wg.Wait()
+	return errors.Join(errs...)
 }
 
-func (app *grape) runOnServer(server server, hostKeyCallback ssh.HostKeyCallback, wg *sync.WaitGroup) {
-
+func (app *grape) runOnServer(server server, hostKeyCallback ssh.HostKeyCallback) (server, error) {
 	client, err := app.ssh.newClient(server, hostKeyCallback)
 	if err != nil {
 		server.Fatal = err.Error()
-	} else {
-		server.Output = client.execCommands(app.commands)
+		return server, fmt.Errorf("%s: %w", server.Host, err)
 	}
-	if wg != nil {
-		wg.Done()
+	defer client.Close()
+
+	server.Output = client.execCommands(app.commands)
+	var errs []error
+	for _, output := range server.Output {
+		if output.Error != "" {
+			errs = append(errs, fmt.Errorf("%s: command %q: %s", server.Host, output.Command, output.Error))
+		}
 	}
-	server.printOutput()
+	return server, errors.Join(errs...)
 }
 
-func (s *server) printOutput() {
-	out, _ := yaml.Marshal(s)
-	fmt.Println(string(out))
+func (s *server) printOutput(out io.Writer) error {
+	data, err := yaml.Marshal(s)
+	if err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintln(out, string(data)); err != nil {
+		return fmt.Errorf("%s: could not print results: %w", s.Host, err)
+	}
+	return nil
 }
 
 func (app *grape) verifyAction() {

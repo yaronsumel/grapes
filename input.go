@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"time"
 
 	"github.com/mitchellh/go-homedir"
 )
@@ -22,6 +23,9 @@ type (
 		serverGroup serverGroup
 		commandName commandName
 		verifyFlag  verifyFlag
+
+		connectTimeout time.Duration
+		commandTimeout time.Duration
 	}
 	inputError error
 )
@@ -34,8 +38,13 @@ func getInputData() *input {
 	keyPathPtr := flag.String("i", "", "identity file - path to private key, defaulting to ~/.ssh/id_rsa")
 	serverGroupPtr := flag.String("s", "", "server group - name of the server group")
 	commandPtr := flag.String("cmd", "", "command name - name of the command to run")
+	connectTimeoutPtr := flag.Duration("connect-timeout", defaultConnectTimeout, "timeout for DNS, TCP connection, and SSH handshake/authentication; must be positive")
+	commandTimeoutPtr := flag.Duration("command-timeout", defaultCommandTimeout, "timeout per command, including session setup and output; must be positive")
 
 	flag.Parse()
+	if *connectTimeoutPtr <= 0 || *commandTimeoutPtr <= 0 {
+		panic("connect-timeout and command-timeout must be greater than zero")
+	}
 
 	if *configPathPtr == "" {
 		potentialConfig, err := homedir.Expand("~/.grapes.yml")
@@ -58,6 +67,9 @@ func getInputData() *input {
 		serverGroup: serverGroup(*serverGroupPtr),
 		keyPath:     keyPath(*keyPathPtr),
 		configPath:  configPath(*configPathPtr),
+
+		connectTimeout: *connectTimeoutPtr,
+		commandTimeout: *commandTimeoutPtr,
 	}
 }
 
