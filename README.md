@@ -18,9 +18,9 @@ docker run -v ~/.grapes.yml:/root/.grapes.yml -v ~/.ssh/id_rsa:/root/.ssh/id_rsa
 
 ### Installation ###
 
-  Run (golang v1.10+ required):
+  Run (Go v1.26+ required):
 
-    $ export GO111MODULE=on; go get -u github.com/yaronsumel/grapes
+    $ go install github.com/yaronsumel/grapes@latest
 
 ### Usage ###
 
@@ -29,6 +29,16 @@ docker run -v ~/.grapes.yml:/root/.grapes.yml -v ~/.ssh/id_rsa:/root/.ssh/id_rsa
     $ grapes -c config.yml -i ~/.ssh/id_rsa -s prod -cmd whats_up --async
 
 * use the --help flag for full usage output.
+
+Each command result includes its captured stdout and stderr under `std.out` and
+`std.err`. An `error` field describes execution or session failures, and
+`exit_status` records the remote exit status when available (including zero for
+success). Stderr output alone does not mean that a command failed.
+
+Grapes finishes reporting all selected servers before exiting, including in
+async mode. It exits with status 1 if any connection, command, or output write
+fails, and status 0 when all succeed. Commands continue after a failed command;
+each result is reported separately. Failure summaries are written to stderr.
 
 ### Config ###
 
@@ -55,5 +65,11 @@ commands:
   date :
       - "date"
  ```
+
+### Tests ###
+
+    $ go test -race ./...
+
+The SSH tests use a local test server and do not require access to a public server.
  
 > ##### Written and Maintained by [@YaronSumel](https://twitter.com/yaronsumel) #####

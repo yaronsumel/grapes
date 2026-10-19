@@ -18,12 +18,15 @@ const (
 )
 
 func main() {
+	os.Exit(runCLI("~/.ssh/known_hosts"))
+}
 
+func runCLI(knownHostsPath string) (exitCode int) {
 	//recover and exit
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Printf("\r\nFatal: %s \n\n", err)
-			os.Exit(1)
+			fmt.Fprintf(os.Stderr, "\r\nFatal: %s \n\n", err)
+			exitCode = 1
 		}
 	}()
 
@@ -33,5 +36,9 @@ func main() {
 
 	app.verifyAction()
 
-	app.run("~/.ssh/known_hosts")
+	if err := app.run(knownHostsPath, os.Stdout); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	return 0
 }

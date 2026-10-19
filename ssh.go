@@ -21,8 +21,10 @@ type (
 		Err string
 	}
 	sshOutput struct {
-		Command command
-		Std     std
+		Command    command
+		Std        std
+		Error      string `yaml:"error,omitempty"`
+		ExitStatus *int   `yaml:"exit_status,omitempty"`
 	}
 	sshOutputArray []*sshOutput
 	sshError       error
@@ -65,15 +67,24 @@ func (client *grapeSSHClient) execCommand(cmd command) *sshOutput {
 	}
 	session, err := client.NewSession()
 	if err != nil {
-		output.Std.Err = "could not establish ssh session"
+		output.Error = fmt.Sprintf("could not establish ssh session: %v", err)
+		return output
+	}
+	defer session.Close()
+
+	var stderr, stdout bytes.Buffer
+	session.Stdout, session.Stderr = &stdout, &stderr
+	err = session.Run(string(cmd))
+	output.Std = std{Out: stdout.String(), Err: stderr.String()}
+	if err == nil {
+		status := 0
+		output.ExitStatus = &status
 	} else {
-		var stderr, stdout bytes.Buffer
-		session.Stdout, session.Stderr = &stdout, &stderr
-		session.Run(string(cmd))
-		session.Close()
-		output.Std = std{
-			Out: stdout.String(),
-			Err: stderr.String(),
+		output.Error = err.Error()
+		var exitErr *ssh.ExitError
+		if errors.As(err, &exitErr) {
+			status := exitErr.ExitStatus()
+			output.ExitStatus = &status
 		}
 	}
 	return output
